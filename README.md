@@ -1,1 +1,1 @@
-# Developpement-d-applications-distribuees
+# Developpement-applications-distribuees
