@@ -1,21 +1,30 @@
-"use client";
-
-import { useState } from "react";
+import { MousePointerClick } from "lucide-react";
 import { ButtonProps } from "@/src/types/ButtonType";
 
-export default function Button({ label, defaultActive = false }: ButtonProps) {
-  const [isActive, setIsActive] = useState(defaultActive);
+export default function Button({ 
+  label, 
+  defaultActive = false, 
+  isHashtag = true, 
+  variant = "theme",
+  onClick 
+}: ButtonProps) {
+  
+  const inactiveClasses = variant === "theme" 
+    ? "bg-[#A395DA]/[0.14] text-[#492775] hover:bg-[#A395DA]/30" 
+    : "bg-white text-[#492775] shadow-sm hover:bg-[#F3F0FF]";
 
   return (
     <button
-      onClick={() => setIsActive(!isActive)}
-      className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 border-none cursor-pointer ${
-        isActive
-          ? "bg-[#A395DA] text-[#FFFFFF]"
-          : "bg-[#A395DA]/[0.14] text-[#492775]" 
+      onClick={onClick}
+      className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[13px] font-bold transition-all duration-200 border-none cursor-pointer ${
+        defaultActive 
+          ? "bg-[#492775] text-white shadow-md" 
+          : inactiveClasses
       }`}
     >
-      #{label}
+      {isHashtag && "#"}
+      {label}
+      {label === "Connexion" && <MousePointerClick size={14} />}
     </button>
   );
 }

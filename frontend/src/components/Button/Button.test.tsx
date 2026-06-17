@@ -1,33 +1,24 @@
-import { render, fireEvent } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
 import Button from "./Button";
 
-describe("Composant Button (Tag)", () => {
-  it("doit afficher les bonnes couleurs par défaut (Inactif)", () => {
-    const { getByRole } = render(<Button label="Test" />);
-    const button = getByRole("button");
-
-    expect(button.className).toContain("text-[#492775]");
-    expect(button.className).toContain("bg-[#A395DA]/[0.14]");
+describe("Composant Button", () => {
+  it("doit afficher le label avec le hashtag par défaut", () => {
+    render(<Button label="TestTheme" />);
+    expect(screen.getByText("#TestTheme")).toBeInTheDocument();
   });
 
-  it("doit changer de couleur après un clic (Actif)", () => {
-    const { getByRole } = render(<Button label="Test" />);
-    const button = getByRole("button");
-
-    fireEvent.click(button);
-
-    expect(button.className).toContain("text-[#FFFFFF]");
-    expect(button.className).toContain("bg-[#A395DA]");
+  it("ne doit pas afficher de hashtag si isHashtag est false", () => {
+    render(<Button label="Connexion" isHashtag={false} variant="action" />);
+    expect(screen.getByText("Connexion")).toBeInTheDocument();
+    expect(screen.queryByText("#Connexion")).not.toBeInTheDocument();
   });
 
-  it("doit revenir aux couleurs de base après un deuxième clic", () => {
-    const { getByRole } = render(<Button label="Test" />);
-    const button = getByRole("button");
-
-    fireEvent.click(button); 
-    fireEvent.click(button); 
-
-    expect(button.className).toContain("text-[#492775]");
+  it("doit appeler la fonction onClick lors d'un clic", () => {
+    const handleClick = vi.fn();
+    render(<Button label="ClicMe" onClick={handleClick} />);
+    
+    fireEvent.click(screen.getByRole("button"));
+    expect(handleClick).toHaveBeenCalledTimes(1);
   });
 });
