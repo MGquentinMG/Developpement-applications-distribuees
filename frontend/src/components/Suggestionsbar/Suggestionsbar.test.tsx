@@ -1,34 +1,47 @@
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
 import ThemeSuggestions from "./Suggestionsbar";
 
-describe("Composant Suggestionbar", () => {
-  // On crée un petit jeu de données de test
-  const mockThemes = ["BestPet", "CatTheBest", "CuteCats"];
+describe("Composant ThemeSuggestions", () => {
+  const mockThemes = ["Cats", "Dogs"];
 
-  it("doit afficher les boutons avec les bons labels", () => {
-    render(<ThemeSuggestions themes={mockThemes} />);
-
-    expect(screen.getByText("#BestPet")).toBeInTheDocument();
-    expect(screen.getByText("#CatTheBest")).toBeInTheDocument();
-    expect(screen.getByText("#CuteCats")).toBeInTheDocument();
+  it("doit afficher tous les thèmes passés en props", () => {
+    render(
+      <ThemeSuggestions 
+        themes={mockThemes} 
+        activeTheme={null} 
+        onThemeChange={vi.fn()} 
+      />
+    );
+    expect(screen.getByText("#Cats")).toBeInTheDocument();
+    expect(screen.getByText("#Dogs")).toBeInTheDocument();
   });
 
-  it("doit avoir le thème 'CatTheBest' actif par défaut (index 1)", () => {
-    render(<ThemeSuggestions themes={mockThemes} />);
+  it("doit renvoyer le nom du thème quand on clique sur un thème inactif", () => {
+    const handleChange = vi.fn();
+    render(
+      <ThemeSuggestions 
+        themes={mockThemes} 
+        activeTheme={null} 
+        onThemeChange={handleChange} 
+      />
+    );
 
-    const activeBtn = screen.getByText("#CatTheBest");
-
-    expect(activeBtn.className).toContain("FFFFFF");
-    expect(activeBtn.className).toContain("bg-[#A395DA]");
+    fireEvent.click(screen.getByText("#Cats"));
+    expect(handleChange).toHaveBeenCalledWith("Cats");
   });
 
-  it("doit avoir le thème 'BestPet' inactif par défaut (index 0)", () => {
-    render(<ThemeSuggestions themes={mockThemes} />);
+  it("doit renvoyer null quand on clique sur le thème déjà actif (désélection)", () => {
+    const handleChange = vi.fn();
+    render(
+      <ThemeSuggestions 
+        themes={mockThemes} 
+        activeTheme="Cats" 
+        onThemeChange={handleChange} 
+      />
+    );
 
-    const inactiveBtn = screen.getByText("#BestPet");
-
-    expect(inactiveBtn.className).toContain("text-[#492775]");
-    expect(inactiveBtn.className).toContain("bg-[#A395DA]/[0.14]");
+    fireEvent.click(screen.getByText("#Cats"));
+    expect(handleChange).toHaveBeenCalledWith(null);
   });
 });
