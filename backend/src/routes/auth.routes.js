@@ -1,4 +1,4 @@
-const authController = require("../controllers/authController");
+const authController = require("../controllers/auth.controller");
 const { validateRegister, validateLogin } = require("../validators/authValidator");
 
 module.exports = async function (fastify, opts) {

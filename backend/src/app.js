@@ -2,7 +2,7 @@ const Fastify = require("fastify");
 
 const app = Fastify({ logger: true });
 
-// 1. Plugins de base (Sécurité)
+// 1. Plugins de base
 app.register(require("@fastify/cors"));
 app.register(require("@fastify/helmet"));
 
@@ -11,14 +11,19 @@ app.register(require("@fastify/jwt"), {
   secret: process.env.JWT_SECRET
 });
 
-// 3. Décorateurs / Middlewares (Enregistré ici, il sera disponible pour les routes suivantes)
-app.register(require("./middlewares/authMiddleware"));
+// 3. Middlewares
+require("./middlewares/auth.middleware")(app);
 
-// 4. Routes (L'ordre n'a pas d'importance entre elles)
+// 4. Routes
 app.register(require("./routes/auth.routes"), { prefix: "/api/auth" });
-app.register(require("./routes/user.routes"), { prefix: "/api/users" }); 
+app.register(require("./routes/users.routes"), { prefix: "/api/users" });
+app.register(require("./routes/posts.routes"), { prefix: "/api/posts" });
+app.register(require("./routes/comments.routes"), { prefix: "/api/comments" });
+app.register(require("./routes/messages.routes"), { prefix: "/api/messages" });
+app.register(require("./routes/notifications.routes"), { prefix: "/api/notifications" });
+app.register(require("./routes/moderation.routes"), { prefix: "/api/moderation" });
 
-// 5. Gestionnaire d'erreurs (DOIT être tout à la fin)
+// 5. Gestionnaire d'erreurs
 app.setErrorHandler((error, request, reply) => {
   request.log.error(error);
   reply.status(error.statusCode || 500).send({
