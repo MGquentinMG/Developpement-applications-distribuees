@@ -1,5 +1,5 @@
 import Button from "../Button/Button";
-import { ThemeSuggestionsProps } from "@/src/types/ThemesSuggestions";
+import { ThemeSuggestionsProps } from "@/src/types/ThemesSuggestionsType";
 
 export default function ThemeSuggestions({ themes }: ThemeSuggestionsProps) {
   return (
