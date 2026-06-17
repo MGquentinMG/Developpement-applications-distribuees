@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ButtonProps } from "@/src/types/Button";
+import { ButtonProps } from "@/src/types/ButtonType";
 
 export default function Button({ label, defaultActive = false }: ButtonProps) {
   const [isActive, setIsActive] = useState(defaultActive);
