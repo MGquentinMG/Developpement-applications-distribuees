@@ -1,0 +1,25 @@
+{
+  "topBanner": {
+    "title1": "Partagez",
+    "title2": "Réagissez",
+    "title3": "Découvrez",
+    "subtitle": "Votre nouvel espace pour suivre l'actualité en temps réel.",
+    "login": "Connexion"
+  },
+  "feed": {
+    "searchPlaceholder": "Rechercher ...",
+    "topHtag": "Top Htag",
+    "noPosts": "Aucun post pour ce thème.",
+    "replies": "Réponses"
+  },
+  "createPost": {
+    "title": "Nouveau post",
+    "placeholder": "Quoi de neuf ?",
+    "publish": "Publier"
+  },
+  "home": {
+    "trends": "Tendances",
+    "noPosts": "Aucun post pour ce thème.",
+    "signUpToSeeMore": "Inscris-toi pour voir plus"
+  }
+}

@@ -6,5 +6,7 @@ export interface PostCardProps {
   likes: string;
   comments: string;
   shares: string;
-  avatarUrl?: string; 
+  avatarUrl?: string;
+  imageUrl?: string;
+  onRequireAuth?: () => void;
 }
