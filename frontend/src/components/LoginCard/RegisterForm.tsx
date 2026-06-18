@@ -20,10 +20,13 @@ const UserIcon = () => (
 
 export function RegisterForm() {
   const [step, setStep] = useState<1 | 2>(1);
+  const [pseudo, setPseudo] = useState<string>('');
   const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [day, setDay] = useState<string>('');
   const [month, setMonth] = useState<string>('');
   const [year, setYear] = useState<string>('');
+  const [acceptTerms, setAcceptTerms] = useState<boolean>(false);
 
   const handleEmailClick = () => setStep(2);
 
@@ -36,14 +39,12 @@ export function RegisterForm() {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Soumission:', { email, dob: `${year}-${month}-${day}` });
+    if (!acceptTerms) return; // Sécurité supplémentaire
+    console.log('Soumission:', { pseudo, email, password, dob: `${year}-${month}-${day}`, acceptTerms });
   };
 
   return (
-    /* Conteneur aligné sur LoginForm : max-w-[400px], shadow-0_4px_20px, p-8 pt-10 */
     <div className="bg-white rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] w-full max-w-[400px] p-8 pt-10 relative">
-      
-      {/* Bouton Fermer */}
       <button className="absolute top-4 right-4 bg-gray-200 hover:bg-gray-300 rounded-full w-7 h-7 flex items-center justify-center text-gray-600 transition-colors">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -51,14 +52,12 @@ export function RegisterForm() {
         </svg>
       </button>
 
-      {/* Titres */}
       <div className="text-center mb-8">
         <h2 className="text-[32px] font-bold text-black tracking-tight leading-tight">Inscription à</h2>
         <h1 className="text-[34px] font-bold text-[#A69ACA] mt-1 tracking-wider uppercase">BREEZY</h1>
       </div>
 
       {step === 1 ? (
-        /* Étape 1 : Boutons Sociaux */
         <div className="space-y-4 px-2">
           <button type="button" className="w-full flex items-center justify-center gap-3 bg-[#F3F4F6] text-gray-800 font-medium rounded-full text-sm px-5 py-3 hover:bg-gray-200 transition-colors">
             <GoogleIcon />
@@ -70,52 +69,102 @@ export function RegisterForm() {
           </button>
         </div>
       ) : (
-        /* Étape 2 : Formulaire de saisie */
-        <form onSubmit={handleSubmit} className="space-y-5 px-2">
+        <form onSubmit={handleSubmit} className="space-y-4 px-2">
+          
           <div>
-            <label className="block text-sm text-gray-900 mb-2">
-              Quelle est ta date de naissance ?
-            </label>
-            <div className="flex gap-2">
-              <select className="bg-[#F3F4F6] text-gray-500 text-sm rounded-lg p-2.5 w-full outline-none appearance-none cursor-pointer" value={day} onChange={(e) => handleSelectChange(e, setDay)}>
-                <option value="">Jour</option>
-                {Array.from({length: 31}, (_, i) => <option key={i+1} value={i+1}>{i+1}</option>)}
-              </select>
-              <select className="bg-[#F3F4F6] text-gray-500 text-sm rounded-lg p-2.5 w-full outline-none appearance-none cursor-pointer" value={month} onChange={(e) => handleSelectChange(e, setMonth)}>
-                <option value="">Mois</option>
-                {['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'].map((m, i) => <option key={i+1} value={i+1}>{m}</option>)}
-              </select>
-              <select className="bg-[#F3F4F6] text-gray-500 text-sm rounded-lg p-2.5 w-full outline-none appearance-none cursor-pointer" value={year} onChange={(e) => handleSelectChange(e, setYear)}>
-                <option value="">Année</option>
-                {Array.from({length: 100}, (_, i) => { const y = new Date().getFullYear() - i; return <option key={y} value={y}>{y}</option> })}
-              </select>
-            </div>
+            <label className="block text-sm text-gray-900 mb-1">Pseudo</label>
+            <InputField 
+              type="text" 
+              placeholder="Ton pseudo" 
+              value={pseudo}
+              onChange={(e) => setPseudo(e.target.value)}
+              required
+            />
           </div>
 
           <div>
-            <label className="block text-sm text-gray-900 mb-2">
-              Quelle est ton adresse e-mail ?
-            </label>
+            <label className="block text-sm text-gray-900 mb-1">Quelle est ton adresse e-mail ?</label>
             <InputField 
               type="email" 
               placeholder="Adresse e-mail" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
+
+          <div>
+            <label className="block text-sm text-gray-900 mb-1">Mot de passe</label>
+            <InputField 
+              type="password" 
+              placeholder="Mot de passe" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-900 mb-1">Quelle est ta date de naissance ?</label>
+            <div className="flex gap-2">
+              <div className="relative w-full">
+                <select className="bg-[#F3F4F6] text-gray-500 text-sm rounded-lg p-2.5 w-full outline-none appearance-none cursor-pointer pr-8" value={day} onChange={(e) => handleSelectChange(e, setDay)} required>
+                  <option value="">Jour</option>
+                  {Array.from({length: 31}, (_, i) => <option key={i+1} value={i+1}>{i+1}</option>)}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-600">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+              </div>
+              <div className="relative w-full">
+                <select className="bg-[#F3F4F6] text-gray-500 text-sm rounded-lg p-2.5 w-full outline-none appearance-none cursor-pointer pr-8" value={month} onChange={(e) => handleSelectChange(e, setMonth)} required>
+                  <option value="">Mois</option>
+                  {['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'].map((m, i) => <option key={i+1} value={i+1}>{m}</option>)}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-600">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+              </div>
+              <div className="relative w-full">
+                <select className="bg-[#F3F4F6] text-gray-500 text-sm rounded-lg p-2.5 w-full outline-none appearance-none cursor-pointer pr-8" value={year} onChange={(e) => handleSelectChange(e, setYear)} required>
+                  <option value="">Année</option>
+                  {Array.from({length: 100}, (_, i) => { const y = new Date().getFullYear() - i; return <option key={y} value={y}>{y}</option> })}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-600">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Nouvelle section de Checkbox */}
+          <div className="flex items-start gap-2 pt-2">
+            <input 
+              type="checkbox" 
+              id="terms" 
+              className="mt-1 w-4 h-4 text-[#A69ACA] bg-gray-100 border-gray-300 rounded focus:ring-[#A69ACA] cursor-pointer"
+              checked={acceptTerms}
+              onChange={(e) => setAcceptTerms(e.target.checked)}
+              required
+            />
+            <label htmlFor="terms" className="text-[10px] text-gray-500 leading-tight cursor-pointer">
+              J'accepte les Conditions d'utilisation de BREEZY et confirme avoir lu la Politique de confidentialité.
+            </label>
+          </div>
           
-          <button type="submit" className="w-full bg-[#A69ACA] text-white font-medium rounded-full text-sm px-5 py-3 mt-4 hover:bg-[#9084b8] transition-colors">
-            Suivant
+          <button type="submit" className="w-full bg-[#A69ACA] text-white font-medium rounded-full text-sm px-5 py-3 mt-2 hover:bg-[#9084b8] transition-colors">
+            Valider
           </button>
         </form>
       )}
 
-      {/* Footer Légal */}
-      <div className="mt-8 text-center text-[8px] text-gray-500 px-8 leading-tight">
-        En continuant, tu acceptes les Conditions d'utilisation de BREEZY et confirmes avoir lu la Politique de confidentialité de BREEZY.
-      </div>
+      {/* Le texte légal en petit est masqué à l'étape 2 puisqu'il est dans la checkbox */}
+      {step === 1 && (
+        <div className="mt-8 text-center text-[8px] text-gray-500 px-8 leading-tight">
+          En continuant, tu acceptes les Conditions d'utilisation de BREEZY et confirmes avoir lu la Politique de confidentialité de BREEZY.
+        </div>
+      )}
 
-      {/* Switch Inscription/Connexion */}
       <div className="mt-6 pt-4 border-t border-gray-100 text-center">
         <p className="text-sm text-gray-800">
           Tu as déjà un compte ? <br/>

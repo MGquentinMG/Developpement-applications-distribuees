@@ -80,7 +80,7 @@ export function LoginForm() {
             />
           </div>
           <button type="submit" className="w-full bg-[#A69ACA] text-white font-medium rounded-full text-sm px-5 py-3 mt-4 hover:bg-[#9084b8] transition-colors">
-            Se connecter
+            Valider
           </button>
         </form>
       )}
