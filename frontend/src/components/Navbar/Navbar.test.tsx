@@ -1,36 +1,53 @@
-import { render } from '@testing-library/react';
-import { describe, it, expect, vi, Mock } from 'vitest'; 
-import Navbar from './Navbar';
-import { usePathname } from 'next/navigation';
+import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
+import Navbar from "./Navbar";
+import { usePathname, useRouter } from "next/navigation";
 
-vi.mock('next/navigation', () => ({
+vi.mock("next/navigation", () => ({
   usePathname: vi.fn(),
+  useRouter: vi.fn(),
 }));
 
-describe('Composant Navbar', () => {
-  it('doit appliquer le style actif (rond blanc) sur le lien Accueil (/)', () => {
-    
-    (usePathname as Mock).mockReturnValue('/');
+vi.mock("../../utils/NavigationUtil", () => ({
+  navLinks: [
+    { name: "Home", href: "/feed", icon: () => <svg data-testid="icon-home" /> },
+    { name: "Profile", href: "/profile", icon: () => <svg data-testid="icon-profile" /> },
+  ]
+}));
 
-    const { container } = render(<Navbar />);
-    const homeLink = container.querySelector('a[href="/"]');
-    
-    expect(homeLink?.className).toContain('bg-white/40');
-    
-    const messagesLink = container.querySelector('a[href="/messages"]');
-    expect(messagesLink?.className).not.toContain('bg-white/40');
+describe("Navbar", () => {
+  const mockPush = vi.fn();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    (useRouter as Mock).mockReturnValue({ push: mockPush });
   });
 
-  it('doit changer le style actif si on est sur la page Messages', () => {
-    
-    (usePathname as Mock).mockReturnValue('/messages');
-
+  it("ne doit pas s'afficher sur la page d'accueil (/)", () => {
+    (usePathname as Mock).mockReturnValue("/");
     const { container } = render(<Navbar />);
+    expect(container).toBeEmptyDOMElement();
+  });
 
-    const messagesLink = container.querySelector('a[href="/messages"]');
-    const homeLink = container.querySelector('a[href="/"]');
+  it("ne doit pas s'afficher sur la page /login", () => {
+    (usePathname as Mock).mockReturnValue("/login");
+    const { container } = render(<Navbar />);
+    expect(container).toBeEmptyDOMElement();
+  });
 
-    expect(messagesLink?.className).toContain('bg-white/40');
-    expect(homeLink?.className).not.toContain('bg-white/40');
+  it("doit s'afficher sur la page /feed", () => {
+    (usePathname as Mock).mockReturnValue("/feed");
+    render(<Navbar />);
+    expect(screen.getByRole("navigation")).toBeInTheDocument();
+  });
+
+  it("doit rediriger vers /create-post au clic sur le bouton central", () => {
+    (usePathname as Mock).mockReturnValue("/feed");
+    render(<Navbar />);
+    
+    const createButton = screen.getByRole("button", { name: /créer un post/i });
+    fireEvent.click(createButton);
+    
+    expect(mockPush).toHaveBeenCalledWith("/create-post");
   });
 });

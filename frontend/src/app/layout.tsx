@@ -19,12 +19,10 @@ export default function RootLayout({
     <html lang="fr">
       <body className={`${inter.className} bg-gray-200`}>
         <div className="max-w-md mx-auto min-h-screen bg-white shadow-2xl relative">
-          
           <main className="pb-20"> 
             {children}
           </main>
           <Navbar />
-          
         </div>
       </body>
     </html>

@@ -5,4 +5,4 @@ export const navLinks = [
   { name: "Messages", href: "/messages", icon: Send }, 
   { name: "Settings", href: "/settings", icon: Settings },
   { name: "Profile", href: "/profile", icon: User },
-];
+];  
