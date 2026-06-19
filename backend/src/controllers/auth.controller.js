@@ -39,7 +39,7 @@ exports.login = async (req, reply) => {
       return errorResponse(reply, "Email ou mot de passe incorrect", 401);
     }
 
-    // ✅ Utiliser app.jwt.sign() au lieu de reply.jwtSign()
+
     const token = req.server.jwt.sign({ 
       id: user._id.toString(), 
       role: user.role 

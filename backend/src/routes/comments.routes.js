@@ -26,6 +26,29 @@ module.exports = async function (fastify, opts) {
     }
   });
 
+
+  fastify.post("/:commentId/replies", { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    try {
+      const { content } = req.body;
+      const parentComment = await Comment.findById(req.params.commentId);
+      if (!parentComment) return errorResponse(reply, "Commentaire non trouvé", 404);
+
+      const reply = await Comment.create({
+        content,
+        author: req.user.id,
+        post: parentComment.post,
+        parentComment: req.params.commentId
+      });
+
+      parentComment.replies.push(reply._id);
+      await parentComment.save();
+
+      return successResponse(reply, reply, "Réponse créée", 201);
+    } catch (err) {
+      return errorResponse(reply, "Erreur", 500);
+    }
+  });
+
   // Supprimer un commentaire
   fastify.delete("/:id", { onRequest: [fastify.authenticate] }, async (req, reply) => {
     try {

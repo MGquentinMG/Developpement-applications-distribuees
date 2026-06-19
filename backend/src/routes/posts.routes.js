@@ -1,4 +1,5 @@
 const Post = require("../models/Post");
+const User = require("../models/User");
 const successResponse = require("../utils/successResponse");
 const errorResponse = require("../utils/errorResponse");
 
@@ -6,10 +7,14 @@ module.exports = async function (fastify, opts) {
   // Créer un post
   fastify.post("/", { onRequest: [fastify.authenticate] }, async (req, reply) => {
     try {
-      const { content } = req.body;
+      const { content, tags, image, video, mentions } = req.body;
       const post = await Post.create({
         content,
-        author: req.user.id
+        author: req.user.id,
+        tags: tags || [],
+        image,
+        video,
+        mentions: mentions || []
       });
       return successResponse(reply, post, "Post créé", 201);
     } catch (err) {
@@ -20,7 +25,45 @@ module.exports = async function (fastify, opts) {
   // Tous les posts
   fastify.get("/", async (req, reply) => {
     try {
-      const posts = await Post.find().populate("author", "username avatar");
+      const posts = await Post.find()
+        .populate("author", "username avatar")
+        .populate("mentions", "username")
+        .sort({ createdAt: -1 });
+      return successResponse(reply, posts);
+    } catch (err) {
+      return errorResponse(reply, "Erreur", 500);
+    }
+  });
+
+  fastify.get("/feed", { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    try {
+      const user = await User.findById(req.user.id).select("following");
+      
+      const posts = await Post.find({
+        author: { $in: user.following }
+      })
+        .populate("author", "username avatar")
+        .sort({ createdAt: -1 });
+      
+      return successResponse(reply, posts);
+    } catch (err) {
+      return errorResponse(reply, "Erreur", 500);
+    }
+  });
+
+
+  fastify.get("/search", async (req, reply) => {
+    try {
+      const { tag, q } = req.query;
+
+      let query = {};
+      if (tag) query.tags = tag;
+      if (q) query.content = { $regex: q, $options: "i" };
+
+      const posts = await Post.find(query)
+        .populate("author", "username avatar")
+        .sort({ createdAt: -1 });
+
       return successResponse(reply, posts);
     } catch (err) {
       return errorResponse(reply, "Erreur", 500);
@@ -30,7 +73,9 @@ module.exports = async function (fastify, opts) {
   // Un post par ID
   fastify.get("/:id", async (req, reply) => {
     try {
-      const post = await Post.findById(req.params.id).populate("author");
+      const post = await Post.findById(req.params.id)
+        .populate("author")
+        .populate("comments");
       if (!post) return errorResponse(reply, "Post non trouvé", 404);
       return successResponse(reply, post);
     } catch (err) {

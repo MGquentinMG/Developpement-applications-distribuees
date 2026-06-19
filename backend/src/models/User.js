@@ -24,8 +24,6 @@ const UserSchema = new mongoose.Schema(
       required: true
     },
 
-    
-
     role: {
       type: String,
       enum: ["user", "moderator", "admin"],
@@ -34,7 +32,29 @@ const UserSchema = new mongoose.Schema(
 
     bio: String,
 
-    avatar: String
+    avatar: String,
+
+    followers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+      }
+    ],
+
+    following: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+      }
+    ],
+    banned: {
+      type: Boolean,
+      default: false
+    },
+
+    banReason: String,
+
+    tags: [String]
   },
   {
     timestamps: true
