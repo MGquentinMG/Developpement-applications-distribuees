@@ -11,7 +11,7 @@ app.register(require("@fastify/jwt"), {
   secret: process.env.JWT_SECRET
 });
 
-// 3. Middlewares ✅ SYNCHRONE - avant les routes
+// 3. Middlewares
 app.decorate("authenticate", async (request, reply) => {
   try {
     await request.jwtVerify();
@@ -23,7 +23,7 @@ app.decorate("authenticate", async (request, reply) => {
   }
 });
 
-// 4. Routes (APRÈS le middleware)
+// 4. Routes
 app.register(require("./routes/auth.routes"), { prefix: "/api/auth" });
 app.register(require("./routes/users.routes"), { prefix: "/api/users" });
 app.register(require("./routes/posts.routes"), { prefix: "/api/posts" });
@@ -31,6 +31,7 @@ app.register(require("./routes/comments.routes"), { prefix: "/api/comments" });
 app.register(require("./routes/messages.routes"), { prefix: "/api/messages" });
 app.register(require("./routes/notifications.routes"), { prefix: "/api/notifications" });
 app.register(require("./routes/moderation.routes"), { prefix: "/api/moderation" });
+app.register(require("./routes/reports.routes"), { prefix: "/api/reports" }); // ⭐ AJOUTER
 
 // 5. Gestionnaire d'erreurs
 app.setErrorHandler((error, request, reply) => {
