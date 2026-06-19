@@ -55,5 +55,10 @@
     "section2": "Legal Notice 2",
     "section3": "Legal Notice 3",
     "section4": "Legal Notice 4"
+  },
+  "messages": {
+    "title": "Contacts",
+    "searchPlaceholder": "Search ...",
+    "inputPlaceholder": "Message..."
   }
 }

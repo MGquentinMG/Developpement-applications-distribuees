@@ -55,5 +55,10 @@
     "section2": "Mentions légales 2",
     "section3": "Mentions légales 3",
     "section4": "Mentions légales 4"
+  },
+  "messages": {
+    "title": "Contacts",
+    "searchPlaceholder": "Rechercher ...",
+    "inputPlaceholder": "Message..."
   }
 }

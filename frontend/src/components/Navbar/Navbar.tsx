@@ -8,7 +8,10 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
 
-  if (pathname === "/" || pathname === "/login" || pathname === "/register" || pathname === "/create-post" || pathname === "/legal") {
+  const isIndividualMessage = pathname.startsWith("/messages/") && pathname !== "/messages";
+  const hiddenRoutes = ["/", "/login", "/register", "/create-post", "/legal"];
+
+  if (hiddenRoutes.includes(pathname) || isIndividualMessage) {
     return null;
   }
 
