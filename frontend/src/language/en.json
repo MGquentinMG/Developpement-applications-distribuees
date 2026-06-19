@@ -31,5 +31,29 @@
     "commented": "commented on your Breezy",
     "shared": "shared your Breezy",
     "empty": "No notifications."
+  },
+  "settings": {
+    "title": "Settings",
+    "editProfile": "Edit profile",
+    "accountSettings": "Account Settings",
+    "appearance": "Appearance",
+    "notification": "Notifications",
+    "language": "Language",
+    "contactSupport": "Contact Support",
+    "signOut": "Sign out",
+    "legalNotice": "Legal notice",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "notifLikes": "Likes",
+    "notifComments": "Comments",
+    "notifShares": "Shares",
+    "notifFollows": "New followers"
+  },
+  "legal": {
+    "title": "Legal Notice",
+    "section1": "Legal Notice 1",
+    "section2": "Legal Notice 2",
+    "section3": "Legal Notice 3",
+    "section4": "Legal Notice 4"
   }
 }

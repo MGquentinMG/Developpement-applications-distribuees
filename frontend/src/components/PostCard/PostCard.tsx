@@ -39,7 +39,7 @@ export default function PostCard({
   };
 
   return (
-    <article className="relative bg-[#A395DA]/[0.14] rounded-3xl p-4 pt-9 mb-8 ml-4 shadow-[0_2px_15px_rgba(0,0,0,0.03)]">
+    <article className="relative bg-[#A395DA]/[0.14] dark:bg-[#2A2438] rounded-3xl p-4 pt-9 mb-8 ml-4 shadow-[0_2px_15px_rgba(0,0,0,0.03)] dark:shadow-none transition-colors duration-300">
       <div 
         className="absolute -top-4 -left-4 flex items-center max-w-[50%] cursor-pointer"
         onClick={handleGenericAction}
@@ -47,7 +47,7 @@ export default function PostCard({
         <div className="z-10 relative shrink-0">
           <Avatar src={avatarUrl} alt={author} />
         </div>
-        <div className="bg-[#A395DA] pl-6 pr-3 py-1 rounded-r-full text-white -ml-4 shadow-sm min-w-0">
+        <div className="bg-[#A395DA] dark:bg-[#492775] pl-6 pr-3 py-1 rounded-r-full text-white -ml-4 shadow-sm min-w-0 transition-colors duration-300">
           <h3 className="font-bold text-[13px] leading-tight truncate" title={author}>
             {displayAuthor}
           </h3>
@@ -61,12 +61,12 @@ export default function PostCard({
         <PostAction icon={Upload} count={shares} filled={false} onClick={handleGenericAction} />
       </div>
 
-      <p className="text-[12px] text-[#492775] font-medium leading-relaxed mt-2 mb-3">
+      <p className="text-[12px] text-[#492775] dark:text-[#D0C9E8] font-medium leading-relaxed mt-2 mb-3 transition-colors duration-300">
         {renderContentWithHashtags(content)}
       </p>
 
       {imageUrl && (
-        <div className="rounded-2xl overflow-hidden mb-3 bg-[#F5F0FF]">
+        <div className="rounded-2xl overflow-hidden mb-3 bg-[#F5F0FF] dark:bg-[#1A1A2E] transition-colors duration-300">
           <img src={imageUrl} alt="post visual" className="w-full object-cover max-h-64" />
         </div>
       )}
