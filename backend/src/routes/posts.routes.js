@@ -4,7 +4,7 @@ const errorResponse = require("../utils/errorResponse");
 
 module.exports = async function (fastify, opts) {
   // Créer un post
-  fastify.post("/", { preHandler: [fastify.authenticate] }, async (req, reply) => {
+  fastify.post("/", { onRequest: [fastify.authenticate] }, async (req, reply) => {
     try {
       const { content } = req.body;
       const post = await Post.create({
@@ -39,7 +39,7 @@ module.exports = async function (fastify, opts) {
   });
 
   // Supprimer un post
-  fastify.delete("/:id", { preHandler: [fastify.authenticate] }, async (req, reply) => {
+  fastify.delete("/:id", { onRequest: [fastify.authenticate] }, async (req, reply) => {
     try {
       const post = await Post.findById(req.params.id);
       if (!post) return errorResponse(reply, "Post non trouvé", 404);
@@ -52,7 +52,7 @@ module.exports = async function (fastify, opts) {
   });
 
   // Liker un post
-  fastify.post("/:id/like", { preHandler: [fastify.authenticate] }, async (req, reply) => {
+  fastify.post("/:id/like", { onRequest: [fastify.authenticate] }, async (req, reply) => {
     try {
       const post = await Post.findById(req.params.id);
       if (!post) return errorResponse(reply, "Post non trouvé", 404);

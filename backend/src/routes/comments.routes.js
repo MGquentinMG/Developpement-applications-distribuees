@@ -5,7 +5,7 @@ const errorResponse = require("../utils/errorResponse");
 
 module.exports = async function (fastify, opts) {
   // Ajouter un commentaire
-  fastify.post("/:postId", { preHandler: [fastify.authenticate] }, async (req, reply) => {
+  fastify.post("/:postId", { onRequest: [fastify.authenticate] }, async (req, reply) => {
     try {
       const { content } = req.body;
       const post = await Post.findById(req.params.postId);
@@ -27,7 +27,7 @@ module.exports = async function (fastify, opts) {
   });
 
   // Supprimer un commentaire
-  fastify.delete("/:id", { preHandler: [fastify.authenticate] }, async (req, reply) => {
+  fastify.delete("/:id", { onRequest: [fastify.authenticate] }, async (req, reply) => {
     try {
       const comment = await Comment.findById(req.params.id);
       if (!comment) return errorResponse(reply, "Commentaire non trouvé", 404);

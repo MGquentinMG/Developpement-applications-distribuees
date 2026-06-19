@@ -4,7 +4,7 @@ const errorResponse = require("../utils/errorResponse");
 
 module.exports = async function (fastify, opts) {
   // Récupérer les notifications
-  fastify.get("/", { preHandler: [fastify.authenticate] }, async (req, reply) => {
+  fastify.get("/", { onRequest: [fastify.authenticate] }, async (req, reply) => {
     try {
       const notifications = await Notification.find({ user: req.user.id })
         .populate("relatedUser", "username avatar")
@@ -16,7 +16,7 @@ module.exports = async function (fastify, opts) {
   });
 
   // Marquer comme lue
-  fastify.patch("/:id", { preHandler: [fastify.authenticate] }, async (req, reply) => {
+  fastify.patch("/:id", { onRequest: [fastify.authenticate] }, async (req, reply) => {
     try {
       const notification = await Notification.findByIdAndUpdate(
         req.params.id,

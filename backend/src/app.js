@@ -11,10 +11,19 @@ app.register(require("@fastify/jwt"), {
   secret: process.env.JWT_SECRET
 });
 
-// 3. Middlewares
-require("./middlewares/auth.middleware")(app);
+// 3. Middlewares ✅ SYNCHRONE - avant les routes
+app.decorate("authenticate", async (request, reply) => {
+  try {
+    await request.jwtVerify();
+  } catch (err) {
+    return reply.status(401).send({
+      success: false,
+      message: "Non autorisé : Token invalide ou absent"
+    });
+  }
+});
 
-// 4. Routes
+// 4. Routes (APRÈS le middleware)
 app.register(require("./routes/auth.routes"), { prefix: "/api/auth" });
 app.register(require("./routes/users.routes"), { prefix: "/api/users" });
 app.register(require("./routes/posts.routes"), { prefix: "/api/posts" });

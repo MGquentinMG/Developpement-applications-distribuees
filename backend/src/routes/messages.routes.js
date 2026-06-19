@@ -4,7 +4,7 @@ const errorResponse = require("../utils/errorResponse");
 
 module.exports = async function (fastify, opts) {
   // Envoyer un message
-  fastify.post("/", { preHandler: [fastify.authenticate] }, async (req, reply) => {
+  fastify.post("/", { onRequest: [fastify.authenticate] }, async (req, reply) => {
     try {
       const { recipientId, content } = req.body;
       const message = await Message.create({
@@ -19,7 +19,7 @@ module.exports = async function (fastify, opts) {
   });
 
   // Récupérer les messages avec un user
-  fastify.get("/:userId", { preHandler: [fastify.authenticate] }, async (req, reply) => {
+  fastify.get("/:userId", { onRequest: [fastify.authenticate] }, async (req, reply) => {
     try {
       const messages = await Message.find({
         $or: [

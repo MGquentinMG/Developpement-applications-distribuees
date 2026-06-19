@@ -5,7 +5,7 @@ const successResponse = require("../utils/successResponse");
 
 module.exports = async function (fastify, opts) {
   // Supprimer un post (admin)
-  fastify.delete("/posts/:id", { preHandler: [fastify.authenticate] }, async (req, reply) => {
+  fastify.delete("/posts/:id", { onRequest: [fastify.authenticate] }, async (req, reply) => {
     try {
       if (req.user.role !== "admin") return errorResponse(reply, "Non autorisé", 403);
       await Post.findByIdAndDelete(req.params.id);
@@ -16,7 +16,7 @@ module.exports = async function (fastify, opts) {
   });
 
   // Supprimer un commentaire (admin)
-  fastify.delete("/comments/:id", { preHandler: [fastify.authenticate] }, async (req, reply) => {
+  fastify.delete("/comments/:id", { onRequest: [fastify.authenticate] }, async (req, reply) => {
     try {
       if (req.user.role !== "admin") return errorResponse(reply, "Non autorisé", 403);
       await Comment.findByIdAndDelete(req.params.id);

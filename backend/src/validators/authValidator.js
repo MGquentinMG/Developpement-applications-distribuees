@@ -6,6 +6,7 @@ const validateRegister = async (request, reply) => {
     username: joi.string().alphanum().min(3).max(30).required(),
     email: joi.string().email().required(),
     password: joi.string().min(6).required(),
+    age: joi.number().min(18).max(120).required(),
   });
 
   try {
