@@ -15,7 +15,7 @@ export default function ThemeSuggestions({ themes, activeTheme, onThemeChange }:
               onClick={() => onThemeChange(activeTheme === theme ? null : theme)}
             />
             {activeTheme === theme && (
-              <div className="h-1 w-6 bg-[#492775] rounded-full animate-in fade-in zoom-in duration-300"></div>
+              <div className="h-1 w-6 bg-[#492775] dark:bg-[#A395DA] rounded-full animate-in fade-in zoom-in duration-300 transition-colors"></div>
             )}
           </div>
         ))}

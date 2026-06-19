@@ -7,10 +7,12 @@ import "../i18n";
 import TopBanner from "../components/TopBanner/TopBanner";
 import ThemeSuggestions from "../components/Suggestionsbar/Suggestionsbar";
 import PostCard from "../components/PostCard/PostCard";
+import { useTheme } from "../contexts/ThemeContext";
 
 export default function Home() {
   const router = useRouter();
   const { t } = useTranslation();
+  const { theme } = useTheme();
   
   const [cutoffY, setCutoffY] = useState<number>(0);
   const postRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -62,11 +64,11 @@ export default function Home() {
   }, [postsToShow.length]);
 
   return (
-    <main className="min-h-screen bg-[#F9F9FB]">
+    <main className="min-h-screen bg-[#F9F9FB] dark:bg-[#121212] transition-colors duration-300">
       <TopBanner />
 
       <div className="mt-4 px-5">
-        <h2 className="text-sm font-bold text-[#1E1E40] mb-4">{t("home.trends")}</h2>
+        <h2 className="text-sm font-bold text-[#1E1E40] dark:text-[#F9F9FB] mb-4 transition-colors duration-300">{t("home.trends")}</h2>
         <ThemeSuggestions
           themes={trendingThemes}
           activeTheme={activeTheme}
@@ -99,22 +101,24 @@ export default function Home() {
         ))}
 
         {filteredPosts.length === 0 && (
-          <p className="text-center text-gray-400 mt-10 text-sm">{t("home.noPosts")}</p>
+          <p className="text-center text-gray-400 dark:text-gray-500 mt-10 text-sm transition-colors duration-300">{t("home.noPosts")}</p>
         )}
       </section>
 
       {cutoffY > 0 && (
         <div
-          className="fixed left-0 right-0 bottom-0 z-30 flex flex-col items-center justify-end pb-16 pointer-events-none"
+          className="fixed left-0 right-0 bottom-0 z-30 flex flex-col items-center justify-end pb-16 pointer-events-none transition-colors duration-300"
           style={{
             top: `${cutoffY - 100}px`,
-            background: "linear-gradient(to bottom, transparent 0%, rgba(249,249,251,0.7) 25%, rgba(249,249,251,0.95) 55%, #F9F9FB 75%)",
+            background: theme === "dark" 
+              ? "linear-gradient(to bottom, transparent 0%, rgba(18,18,18,0.7) 25%, rgba(18,18,18,0.95) 55%, #121212 75%)"
+              : "linear-gradient(to bottom, transparent 0%, rgba(249,249,251,0.7) 25%, rgba(249,249,251,0.95) 55%, #F9F9FB 75%)",
           }}
         >
           <div className="pointer-events-auto">
             <button
               onClick={() => router.push("/register")}
-              className="bg-[#492775] text-white px-8 py-3.5 rounded-full font-bold text-[14px] shadow-[0_4px_15px_rgba(73,39,117,0.3)] hover:bg-[#3a1f5d] transition-all transform hover:scale-105"
+              className="bg-[#492775] text-white dark:bg-[#A395DA] dark:text-[#1E1E40] px-8 py-3.5 rounded-full font-bold text-[14px] shadow-[0_4px_15px_rgba(73,39,117,0.3)] dark:shadow-[0_4px_15px_rgba(163,149,218,0.2)] hover:bg-[#3a1f5d] dark:hover:bg-[#8B7BB5] transition-all transform hover:scale-105 duration-300"
             >
               {t("home.signUpToSeeMore")}
             </button>

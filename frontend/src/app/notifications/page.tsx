@@ -26,13 +26,13 @@ export default function NotificationsPage() {
     : mockNotifications;
 
   return (
-    <main className="min-h-screen bg-[#F9F9FB] pb-32 relative">
-      <div className="flex items-center justify-between px-4 py-4 sticky top-0 bg-[#F9F9FB] z-10">
+    <main className="min-h-screen bg-[#F9F9FB] dark:bg-[#121212] pb-32 relative transition-colors duration-300">
+      <div className="flex items-center justify-between px-4 py-4 sticky top-0 bg-[#F9F9FB] dark:bg-[#121212] z-10 transition-colors duration-300">
         <div className="w-10">
           <Logo />
         </div>
-        <div className="bg-[#EAE5F3] px-6 py-2 rounded-2xl">
-          <h1 className="text-[#1E1E40] font-bold text-sm">{t("notifications.title")}</h1>
+        <div className="bg-[#EAE5F3] dark:bg-[#2A2438] px-6 py-2 rounded-2xl transition-colors duration-300">
+          <h1 className="text-[#1E1E40] dark:text-[#F9F9FB] font-bold text-sm transition-colors duration-300">{t("notifications.title")}</h1>
         </div>
         <div className="w-10"></div>
       </div>
@@ -44,16 +44,20 @@ export default function NotificationsPage() {
       <div className="px-5 mt-2 mb-6 flex gap-3">
         <button
           onClick={() => setFilter("new")}
-          className={`px-5 py-1.5 rounded-full text-sm font-semibold transition-colors ${
-            filter === "new" ? "bg-[#A395DA] text-white shadow-sm" : "bg-[#EAE5F3] text-[#492775]"
+          className={`px-5 py-1.5 rounded-full text-sm font-semibold transition-colors duration-300 ${
+            filter === "new" 
+              ? "bg-[#A395DA] text-white shadow-sm dark:bg-[#492775] dark:text-[#D0C9E8]" 
+              : "bg-[#EAE5F3] text-[#492775] dark:bg-[#2A2438] dark:text-[#A395DA]"
           }`}
         >
           {t("notifications.new")}
         </button>
         <button
           onClick={() => setFilter("all")}
-          className={`px-5 py-1.5 rounded-full text-sm font-semibold transition-colors ${
-            filter === "all" ? "bg-[#A395DA] text-white shadow-sm" : "bg-[#EAE5F3] text-[#492775]"
+          className={`px-5 py-1.5 rounded-full text-sm font-semibold transition-colors duration-300 ${
+            filter === "all" 
+              ? "bg-[#A395DA] text-white shadow-sm dark:bg-[#492775] dark:text-[#D0C9E8]" 
+              : "bg-[#EAE5F3] text-[#492775] dark:bg-[#2A2438] dark:text-[#A395DA]"
           }`}
         >
           {t("notifications.all")}
@@ -73,7 +77,7 @@ export default function NotificationsPage() {
         ))}
 
         {filteredNotifications.length === 0 && (
-          <p className="text-center text-gray-400 mt-10 text-sm">
+          <p className="text-center text-gray-400 dark:text-gray-500 mt-10 text-sm transition-colors duration-300">
             {t("notifications.empty")}
           </p>
         )}

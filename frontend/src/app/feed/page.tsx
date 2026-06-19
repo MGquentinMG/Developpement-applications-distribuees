@@ -90,9 +90,9 @@ export default function FeedPage() {
   }, [activeTheme, searchQuery]);
 
   return (
-    <main className="min-h-screen bg-[#F9F9FB] pb-32">
-      <div className="flex items-center gap-3 px-4 pt-4 pb-3 sticky top-0 bg-[#F9F9FB] z-40">
-        <div className="w-9 h-9 rounded-full bg-[#1E1E40] flex items-center justify-center flex-shrink-0">
+    <main className="min-h-screen bg-[#F9F9FB] dark:bg-[#121212] pb-32 transition-colors duration-300">
+      <div className="flex items-center gap-3 px-4 pt-4 pb-3 sticky top-0 bg-[#F9F9FB] dark:bg-[#121212] z-40 transition-colors duration-300">
+        <div className="w-9 h-9 rounded-full bg-[#1E1E40] dark:bg-[#2A2438] flex items-center justify-center flex-shrink-0 transition-colors duration-300">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="8" r="4" />
             <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
@@ -101,7 +101,7 @@ export default function FeedPage() {
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
         <button 
           onClick={() => router.push("/notifications")}
-          className="w-9 h-9 rounded-full bg-[#EDE9F7] flex items-center justify-center text-[#492775] hover:bg-[#E0D8F0] transition-colors flex-shrink-0 cursor-pointer"
+          className="w-9 h-9 rounded-full bg-[#EDE9F7] dark:bg-[#2A2438] flex items-center justify-center text-[#492775] dark:text-[#A395DA] hover:bg-[#E0D8F0] dark:hover:bg-[#3A304D] transition-colors flex-shrink-0 cursor-pointer duration-300"
           aria-label="Notifications"
         >
           <Bell size={18} strokeWidth={2.5} />
@@ -109,7 +109,7 @@ export default function FeedPage() {
       </div>
 
       <div className="px-5 pb-2 mt-2">
-        <h2 className="text-xs font-bold text-[#1E1E40] mb-3">{t("feed.topHtag")}</h2>
+        <h2 className="text-xs font-bold text-[#1E1E40] dark:text-[#F9F9FB] mb-3 transition-colors duration-300">{t("feed.topHtag")}</h2>
         <ThemeSuggestions
           themes={trendingThemes}
           activeTheme={activeTheme}
@@ -133,7 +133,7 @@ export default function FeedPage() {
         ))}
 
         {filteredPosts.length === 0 && (
-          <p className="text-center text-gray-400 mt-10 text-sm">
+          <p className="text-center text-gray-400 dark:text-gray-500 mt-10 text-sm transition-colors duration-300">
             {t("feed.noPosts")}
           </p>
         )}

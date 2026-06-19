@@ -31,5 +31,29 @@
     "commented": "a commenté votre Breezy",
     "shared": "a partagé votre Breezy",
     "empty": "Aucune notification."
+  },
+  "settings": {
+    "title": "Paramètres",
+    "editProfile": "Modifier le profil",
+    "accountSettings": "Paramètres du compte",
+    "appearance": "Apparence",
+    "notification": "Notifications",
+    "language": "Langue",
+    "contactSupport": "Contacter le support",
+    "signOut": "Déconnexion",
+    "legalNotice": "Mentions légales",
+    "themeLight": "Clair",
+    "themeDark": "Sombre",
+    "notifLikes": "J'aimes",
+    "notifComments": "Commentaires",
+    "notifShares": "Partages",
+    "notifFollows": "Nouveaux abonnés"
+  },
+  "legal": {
+    "title": "Mentions Légales",
+    "section1": "Mentions légales 1",
+    "section2": "Mentions légales 2",
+    "section3": "Mentions légales 3",
+    "section4": "Mentions légales 4"
   }
 }
