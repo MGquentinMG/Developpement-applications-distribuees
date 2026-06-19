@@ -2,6 +2,8 @@
 
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "next/navigation";
+import { Bell } from "lucide-react";
 import "../../i18n";
 import SearchBar from "../../components/Searchbar/Searchbar";
 import ThemeSuggestions from "../../components/Suggestionsbar/Suggestionsbar";
@@ -10,6 +12,7 @@ import { PostCardProps } from "../../types/PostCardType";
 
 export default function FeedPage() {
   const { t } = useTranslation();
+  const router = useRouter();
   const [activeTheme, setActiveTheme] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -31,6 +34,7 @@ export default function FeedPage() {
       author: "PandaRoux",
       timeAgo: "2h",
       content: "Ailurus fulgens, le panda fuligineux, également désigné sous les noms de panda roux, panda éclatant, ou encore Petit panda de l'Inde. Longtemps considérée comme un genre monotypique. #BestPet",
+      imageUrl: "https://images.unsplash.com/photo-1552554474-06c888d1d860?w=600&q=80",
       likes: "2K", comments: "2K", shares: "2K",
     },
     {
@@ -95,6 +99,13 @@ export default function FeedPage() {
           </svg>
         </div>
         <SearchBar value={searchQuery} onChange={setSearchQuery} />
+        <button 
+          onClick={() => router.push("/notifications")}
+          className="w-9 h-9 rounded-full bg-[#EDE9F7] flex items-center justify-center text-[#492775] hover:bg-[#E0D8F0] transition-colors flex-shrink-0 cursor-pointer"
+          aria-label="Notifications"
+        >
+          <Bell size={18} strokeWidth={2.5} />
+        </button>
       </div>
 
       <div className="px-5 pb-2 mt-2">

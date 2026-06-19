@@ -21,5 +21,15 @@
     "trends": "Trends",
     "noPosts": "No posts for this theme.",
     "signUpToSeeMore": "Sign up to see more"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "new": "New",
+    "all": "All",
+    "addedFriend": "added you as a friend",
+    "liked": "liked your Breezy",
+    "commented": "commented on your Breezy",
+    "shared": "shared your Breezy",
+    "empty": "No notifications."
   }
 }
