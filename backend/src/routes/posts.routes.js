@@ -74,8 +74,11 @@ module.exports = async function (fastify, opts) {
   fastify.get("/:id", async (req, reply) => {
     try {
       const post = await Post.findById(req.params.id)
-        .populate("author")
-        .populate("comments");
+        .populate("author", "username avatar")
+        .populate({
+          path: "comments",
+          populate: { path: "author", select: "username avatar" },
+        });
       if (!post) return errorResponse(reply, "Post non trouvé", 404);
       return successResponse(reply, post);
     } catch (err) {
