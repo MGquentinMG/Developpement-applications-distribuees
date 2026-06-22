@@ -29,7 +29,9 @@ export function usePostCard(id: string | number, onRequireAuth?: () => void, onC
     e.preventDefault();
     e.stopPropagation();
     
-    if (onCommentClick) {
+    if (onRequireAuth) {
+      onRequireAuth();
+    } else if (onCommentClick) {
       onCommentClick();
     } else if (id && pathname !== `/post/${id}`) {
       router.push(`/post/${id}`);
@@ -39,7 +41,12 @@ export function usePostCard(id: string | number, onRequireAuth?: () => void, onC
   const handleShareClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsShareModalOpen(true);
+    
+    if (onRequireAuth) {
+      onRequireAuth();
+    } else {
+      setIsShareModalOpen(true);
+    }
   };
 
   return {

@@ -1,12 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next"; 
 import Logo from "../Logo/Logo"; 
 import Button from "../Button/Button";
+import { TopBannerProps } from "../../types/TopBannerType";
+import "../../i18n";
 
-export default function TopBanner() {
-  const router = useRouter();
+export default function TopBanner({ onLoginClick }: TopBannerProps) {
   const { t } = useTranslation();
 
   return (
@@ -29,7 +29,7 @@ export default function TopBanner() {
             label={t("topBanner.login")} 
             isHashtag={false} 
             variant="action" 
-            onClick={() => router.push("/login")}
+            onClick={onLoginClick}
           />
           <div className="w-28 h-28 mr-1 mt-3">
             <Logo />

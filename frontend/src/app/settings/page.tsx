@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import "../../i18n";
@@ -9,16 +7,24 @@ import Avatar from "../../components/Avatar/Avatar";
 import AccordionItem from "../../components/AccordionItem/AccordionItem";
 import BackButton from "../../components/BackButton/BackButton";
 import Toggle from "../../components/Toggle/Toggle";
-import { useTheme } from "../../contexts/ThemeContext";
+import { useSettings } from "../../hooks/useSettings";
 
 export default function SettingsPage() {
-  const { t, i18n } = useTranslation();
-  const { theme, toggleTheme } = useTheme();
-  
-  const [notifLikes, setNotifLikes] = useState(true);
-  const [notifComments, setNotifComments] = useState(true);
-  const [notifShares, setNotifShares] = useState(false);
-  const [notifFollows, setNotifFollows] = useState(true);
+  const {
+    t,
+    theme,
+    toggleTheme,
+    currentLang,
+    handleLanguageChange,
+    notifLikes,
+    setNotifLikes,
+    notifComments,
+    setNotifComments,
+    notifShares,
+    setNotifShares,
+    notifFollows,
+    setNotifFollows
+  } = useSettings();
 
   return (
     <main className="min-h-screen bg-white dark:bg-[#121212] pb-32 transition-colors duration-300">
@@ -36,7 +42,7 @@ export default function SettingsPage() {
         </div>
         <div className="flex flex-col">
           <span className="text-[#1E1E40] dark:text-[#F9F9FB] text-[19px] font-bold">User name</span>
-          <button className="flex items-center text-[#8B7BB5] dark:text-[#A395DA] text-sm mt-0.5 hover:underline">
+          <button className="flex items-center text-[#8B7BB5] dark:text-[#A395DA] text-sm mt-0.5 hover:underline bg-transparent border-none cursor-pointer">
             {t("settings.editProfile")} <ChevronRight size={16} className="ml-1" />
           </button>
         </div>
@@ -55,7 +61,7 @@ export default function SettingsPage() {
           <div className="flex gap-4 px-2">
             <button 
               onClick={() => toggleTheme("light")}
-              className={`flex-1 py-2.5 rounded-xl border-2 font-bold transition-all ${
+              className={`flex-1 py-2.5 rounded-xl border-2 font-bold transition-all cursor-pointer ${
                 theme === "light" 
                   ? "border-[#492775] text-[#492775] bg-[#F5F0FF] dark:bg-[#2A2438] dark:text-[#D0C9E8] dark:border-[#D0C9E8]" 
                   : "border-gray-200 text-gray-500 hover:border-gray-300 dark:border-gray-700 dark:text-gray-400"
@@ -65,7 +71,7 @@ export default function SettingsPage() {
             </button>
             <button 
               onClick={() => toggleTheme("dark")}
-              className={`flex-1 py-2.5 rounded-xl border-2 font-bold transition-all ${
+              className={`flex-1 py-2.5 rounded-xl border-2 font-bold transition-all cursor-pointer ${
                 theme === "dark" 
                   ? "border-[#492775] text-[#492775] bg-[#F5F0FF] dark:bg-[#2A2438] dark:text-[#D0C9E8] dark:border-[#D0C9E8]" 
                   : "border-gray-200 text-gray-500 hover:border-gray-300 dark:border-gray-700 dark:text-gray-400"
@@ -88,9 +94,9 @@ export default function SettingsPage() {
         <AccordionItem title={t("settings.language")} variant="settings">
           <div className="flex gap-4 px-2">
             <button 
-              onClick={() => i18n.changeLanguage('fr')}
-              className={`flex-1 py-2.5 rounded-xl border-2 font-bold transition-all ${
-                i18n.language === "fr" 
+              onClick={() => handleLanguageChange('fr')}
+              className={`flex-1 py-2.5 rounded-xl border-2 font-bold transition-all cursor-pointer ${
+                currentLang === "fr" 
                   ? "border-[#492775] text-[#492775] bg-[#F5F0FF] dark:bg-[#2A2438] dark:text-[#D0C9E8] dark:border-[#D0C9E8]" 
                   : "border-gray-200 text-gray-500 hover:border-gray-300 dark:border-gray-700 dark:text-gray-400"
               }`}
@@ -98,9 +104,9 @@ export default function SettingsPage() {
               Français
             </button>
             <button 
-              onClick={() => i18n.changeLanguage('en')}
-              className={`flex-1 py-2.5 rounded-xl border-2 font-bold transition-all ${
-                i18n.language === "en" 
+              onClick={() => handleLanguageChange('en')}
+              className={`flex-1 py-2.5 rounded-xl border-2 font-bold transition-all cursor-pointer ${
+                currentLang === "en" 
                   ? "border-[#492775] text-[#492775] bg-[#F5F0FF] dark:bg-[#2A2438] dark:text-[#D0C9E8] dark:border-[#D0C9E8]" 
                   : "border-gray-200 text-gray-500 hover:border-gray-300 dark:border-gray-700 dark:text-gray-400"
               }`}
@@ -117,7 +123,7 @@ export default function SettingsPage() {
           </div>
         </AccordionItem>
 
-        <button className="text-left py-4 text-[#E50000] dark:text-[#FF6B6B] font-bold text-[17px] mt-2 hover:bg-gray-50 dark:hover:bg-[#1A1A2E] transition-colors">
+        <button className="text-left py-4 text-[#E50000] dark:text-[#FF6B6B] font-bold text-[17px] mt-2 hover:bg-gray-50 dark:hover:bg-[#1A1A2E] transition-colors cursor-pointer bg-transparent border-none">
           {t("settings.signOut")}
         </button>
         

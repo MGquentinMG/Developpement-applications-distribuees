@@ -1,91 +1,115 @@
 {
   "topBanner": {
-    "title1": "Partagez",
-    "title2": "Réagissez",
-    "title3": "Découvrez",
-    "subtitle": "Votre nouvel espace pour suivre l'actualité en temps réel.",
-    "login": "Connexion"
+    "title1": "Share",
+    "title2": "React",
+    "title3": "Discover",
+    "subtitle": "Your new space to follow the news in real time.",
+    "login": "Log in"
   },
   "feed": {
-    "searchPlaceholder": "Rechercher ...",
+    "searchPlaceholder": "Search ...",
     "topHtag": "Top Htag",
-    "noPosts": "Aucun post pour ce thème.",
-    "replies": "Réponses"
+    "noPosts": "No posts for this theme.",
+    "replies": "Replies"
   },
   "createPost": {
-    "title": "Nouveau post",
-    "placeholder": "Quoi de neuf ?",
-    "publish": "Publier"
+    "title": "New post",
+    "placeholder": "What's up?",
+    "publish": "Publish"
   },
   "home": {
-    "trends": "Tendances",
-    "noPosts": "Aucun post pour ce thème.",
-    "signUpToSeeMore": "Inscris-toi pour voir plus"
+    "trends": "Trends",
+    "noPosts": "No posts for this theme.",
+    "signUpToSeeMore": "Sign up to see more"
   },
   "notifications": {
     "title": "Notifications",
-    "new": "Nouvelles",
-    "all": "Toutes",
-    "addedFriend": "vous a ajouté en ami",
-    "liked": "a aimé votre Breezy",
-    "commented": "a commenté votre Breezy",
-    "shared": "a partagé votre Breezy",
-    "empty": "Aucune notification."
+    "new": "New",
+    "all": "All",
+    "addedFriend": "added you as a friend",
+    "liked": "liked your Breezy",
+    "commented": "commented on your Breezy",
+    "shared": "shared your Breezy",
+    "empty": "No notifications."
   },
   "settings": {
-    "title": "Paramètres",
-    "editProfile": "Modifier le profil",
-    "accountSettings": "Paramètres du compte",
-    "appearance": "Apparence",
+    "title": "Settings",
+    "editProfile": "Edit profile",
+    "accountSettings": "Account Settings",
+    "appearance": "Appearance",
     "notification": "Notifications",
-    "language": "Langue",
-    "contactSupport": "Contacter le support",
-    "signOut": "Déconnexion",
-    "legalNotice": "Mentions légales",
-    "themeLight": "Clair",
-    "themeDark": "Sombre",
-    "notifLikes": "J'aimes",
-    "notifComments": "Commentaires",
-    "notifShares": "Partages",
-    "notifFollows": "Nouveaux abonnés"
+    "language": "Language",
+    "contactSupport": "Contact Support",
+    "signOut": "Sign out",
+    "legalNotice": "Legal notice",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "notifLikes": "Likes",
+    "notifComments": "Comments",
+    "notifShares": "Shares",
+    "notifFollows": "New followers"
   },
   "legal": {
-    "title": "Mentions Légales",
-    "section1": "Mentions légales 1",
-    "section2": "Mentions légales 2",
-    "section3": "Mentions légales 3",
-    "section4": "Mentions légales 4"
+    "title": "Legal Notice",
+    "section1": "Legal Notice 1",
+    "section2": "Legal Notice 2",
+    "section3": "Legal Notice 3",
+    "section4": "Legal Notice 4"
   },
   "messages": {
     "title": "Contacts",
-    "searchPlaceholder": "Rechercher ...",
+    "searchPlaceholder": "Search ...",
     "inputPlaceholder": "Message..."
   },
   "share": {
-    "title": "Partager à",
-    "sent": "Envoyé",
-    "send": "Envoyer",
+    "title": "Share with",
+    "sent": "Sent",
+    "send": "Send",
     "message": "Message",
     "email": "Email"
   },
   "post": {
-    "reply": "Répondre",
-    "addComment": "Ajouter un commentaire..."
+    "reply": "Reply",
+    "addComment": "Add a comment..."
   },
   "profile": {
-    "subscribe": "S'abonner",
-    "edit": "Éditer",
-    "myProfile": "Mon Profil",
-    "subscriptions": "Abonnements",
-    "subscribers": "Abonnés",
+    "subscribe": "Subscribe",
+    "edit": "Edit",
+    "myProfile": "My Profile",
+    "subscriptions": "Following",
+    "subscribers": "Followers",
     "posts": "Breezys",
-    "replies": "Réponses",
-    "noReplies": "Aucune réponse pour le moment."
+    "replies": "Replies",
+    "noReplies": "No replies yet."
   },
   "button": {
-    "login": "Connexion"
+    "login": "Login"
   },
   "navbar": {
-    "createPost": "Créer un post"
+    "createPost": "Create a post"
+  },
+  "auth": {
+    "loginTitle": "Log in to",
+    "registerTitle": "Sign up for",
+    "googleLogin": "Continue with Google",
+    "emailLogin": "Continue with email",
+    "googleRegister": "Sign up with Google",
+    "emailRegister": "Sign up with email",
+    "emailLabel": "Email address",
+    "passwordLabel": "Password",
+    "pseudoLabel": "Username",
+    "pseudoPlaceholder": "Your username",
+    "dobLabel": "What is your date of birth?",
+    "day": "Day",
+    "month": "Month",
+    "year": "Year",
+    "terms": "I accept the BREEZY Terms of Service and confirm I have read the Privacy Policy.",
+    "termsShort": "By continuing, you accept the BREEZY Terms of Service and confirm you have read the Privacy Policy.",
+    "submit": "Submit",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "signUp": "Sign up",
+    "signIn": "Log in",
+    "loading": "Loading..."
   }
 }
