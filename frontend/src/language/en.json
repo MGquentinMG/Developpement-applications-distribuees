@@ -1,64 +1,91 @@
 {
   "topBanner": {
-    "title1": "Share",
-    "title2": "React",
-    "title3": "Discover",
-    "subtitle": "Your new space to follow the news in real time.",
-    "login": "Log in"
+    "title1": "Partagez",
+    "title2": "Réagissez",
+    "title3": "Découvrez",
+    "subtitle": "Votre nouvel espace pour suivre l'actualité en temps réel.",
+    "login": "Connexion"
   },
   "feed": {
-    "searchPlaceholder": "Search ...",
+    "searchPlaceholder": "Rechercher ...",
     "topHtag": "Top Htag",
-    "noPosts": "No posts for this theme.",
-    "replies": "Replies"
+    "noPosts": "Aucun post pour ce thème.",
+    "replies": "Réponses"
   },
   "createPost": {
-    "title": "New post",
-    "placeholder": "What's up?",
-    "publish": "Publish"
+    "title": "Nouveau post",
+    "placeholder": "Quoi de neuf ?",
+    "publish": "Publier"
   },
   "home": {
-    "trends": "Trends",
-    "noPosts": "No posts for this theme.",
-    "signUpToSeeMore": "Sign up to see more"
+    "trends": "Tendances",
+    "noPosts": "Aucun post pour ce thème.",
+    "signUpToSeeMore": "Inscris-toi pour voir plus"
   },
   "notifications": {
     "title": "Notifications",
-    "new": "New",
-    "all": "All",
-    "addedFriend": "added you as a friend",
-    "liked": "liked your Breezy",
-    "commented": "commented on your Breezy",
-    "shared": "shared your Breezy",
-    "empty": "No notifications."
+    "new": "Nouvelles",
+    "all": "Toutes",
+    "addedFriend": "vous a ajouté en ami",
+    "liked": "a aimé votre Breezy",
+    "commented": "a commenté votre Breezy",
+    "shared": "a partagé votre Breezy",
+    "empty": "Aucune notification."
   },
   "settings": {
-    "title": "Settings",
-    "editProfile": "Edit profile",
-    "accountSettings": "Account Settings",
-    "appearance": "Appearance",
+    "title": "Paramètres",
+    "editProfile": "Modifier le profil",
+    "accountSettings": "Paramètres du compte",
+    "appearance": "Apparence",
     "notification": "Notifications",
-    "language": "Language",
-    "contactSupport": "Contact Support",
-    "signOut": "Sign out",
-    "legalNotice": "Legal notice",
-    "themeLight": "Light",
-    "themeDark": "Dark",
-    "notifLikes": "Likes",
-    "notifComments": "Comments",
-    "notifShares": "Shares",
-    "notifFollows": "New followers"
+    "language": "Langue",
+    "contactSupport": "Contacter le support",
+    "signOut": "Déconnexion",
+    "legalNotice": "Mentions légales",
+    "themeLight": "Clair",
+    "themeDark": "Sombre",
+    "notifLikes": "J'aimes",
+    "notifComments": "Commentaires",
+    "notifShares": "Partages",
+    "notifFollows": "Nouveaux abonnés"
   },
   "legal": {
-    "title": "Legal Notice",
-    "section1": "Legal Notice 1",
-    "section2": "Legal Notice 2",
-    "section3": "Legal Notice 3",
-    "section4": "Legal Notice 4"
+    "title": "Mentions Légales",
+    "section1": "Mentions légales 1",
+    "section2": "Mentions légales 2",
+    "section3": "Mentions légales 3",
+    "section4": "Mentions légales 4"
   },
   "messages": {
     "title": "Contacts",
-    "searchPlaceholder": "Search ...",
+    "searchPlaceholder": "Rechercher ...",
     "inputPlaceholder": "Message..."
+  },
+  "share": {
+    "title": "Partager à",
+    "sent": "Envoyé",
+    "send": "Envoyer",
+    "message": "Message",
+    "email": "Email"
+  },
+  "post": {
+    "reply": "Répondre",
+    "addComment": "Ajouter un commentaire..."
+  },
+  "profile": {
+    "subscribe": "S'abonner",
+    "edit": "Éditer",
+    "myProfile": "Mon Profil",
+    "subscriptions": "Abonnements",
+    "subscribers": "Abonnés",
+    "posts": "Breezys",
+    "replies": "Réponses",
+    "noReplies": "Aucune réponse pour le moment."
+  },
+  "button": {
+    "login": "Connexion"
+  },
+  "navbar": {
+    "createPost": "Créer un post"
   }
 }

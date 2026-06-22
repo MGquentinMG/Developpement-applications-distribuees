@@ -1,12 +1,13 @@
 export interface PostCardProps {
-  id?: number | string;
+  id: string | number;
   author: string;
   timeAgo: string;
   content: string;
-  likes: string;
-  comments: string;
-  shares: string;
+  likes: string | number;
+  comments: string | number;
+  shares: string | number;
   avatarUrl?: string;
   imageUrl?: string;
   onRequireAuth?: () => void;
+  onCommentClick?: () => void;
 }

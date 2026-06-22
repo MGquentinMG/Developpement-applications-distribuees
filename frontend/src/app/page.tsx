@@ -88,6 +88,7 @@ export default function Home() {
             }
           >
             <PostCard
+              id={post.id}
               author={post.author}
               timeAgo={post.timeAgo}
               content={post.content}
@@ -118,7 +119,7 @@ export default function Home() {
           <div className="pointer-events-auto">
             <button
               onClick={() => router.push("/register")}
-              className="bg-[#492775] text-white dark:bg-[#A395DA] dark:text-[#1E1E40] px-8 py-3.5 rounded-full font-bold text-[14px] shadow-[0_4px_15px_rgba(73,39,117,0.3)] dark:shadow-[0_4px_15px_rgba(163,149,218,0.2)] hover:bg-[#3a1f5d] dark:hover:bg-[#8B7BB5] transition-all transform hover:scale-105 duration-300"
+              className="bg-[#492775] text-white dark:bg-[#A395DA] dark:text-[#1E1E40] px-8 py-3.5 rounded-full font-bold text-[14px] shadow-[0_4px_15px_rgba(73,39,117,0.3)] dark:shadow-[0_4px_15px_rgba(163,149,218,0.2)] hover:bg-[#3a1f5d] dark:hover:bg-[#8B7BB5] transition-all transform hover:scale-105 duration-300 cursor-pointer"
             >
               {t("home.signUpToSeeMore")}
             </button>

@@ -1,13 +1,8 @@
 "use client";
 
 import { useTranslation } from "react-i18next";
-
-interface SearchBarProps {
-  value: string;
-  onChange: (val: string) => void;
-  variant?: "default" | "messages";
-  placeholder?: string;
-}
+import { SearchBarProps } from "../../types/SearchbarType";
+import "../../i18n";
 
 export default function SearchBar({ value, onChange, variant = "default", placeholder }: SearchBarProps) {
   const { t } = useTranslation();
@@ -40,7 +35,7 @@ export default function SearchBar({ value, onChange, variant = "default", placeh
         className={`bg-transparent outline-none text-sm w-full font-medium transition-colors duration-300 ${textClasses}`}
       />
       {value && (
-        <button onClick={() => onChange("")} className={`${iconColor} hover:opacity-70 transition-colors`}>
+        <button onClick={() => onChange("")} className={`${iconColor} hover:opacity-70 transition-colors cursor-pointer`}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="18" y1="6" x2="6" y2="18" />
             <line x1="6" y1="6" x2="18" y2="18" />

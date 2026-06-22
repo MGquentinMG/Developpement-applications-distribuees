@@ -121,6 +121,7 @@ export default function FeedPage() {
         {filteredPosts.map((post) => (
           <PostCard
             key={post.id}
+            id="message-input"
             author={post.author}
             timeAgo={post.timeAgo}
             content={post.content}
