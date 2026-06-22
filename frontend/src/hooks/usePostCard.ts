@@ -10,6 +10,10 @@ export function usePostCard(id: string | number, onRequireAuth?: () => void, onC
   const postUrl = typeof window !== "undefined" ? `${window.location.origin}/post/${id}` : "";
 
   const handleCardClick = () => {
+    if (onRequireAuth) {
+      onRequireAuth();
+      return;
+    }
     if (id && pathname !== `/post/${id}`) {
       router.push(`/post/${id}`);
     }
@@ -17,17 +21,24 @@ export function usePostCard(id: string | number, onRequireAuth?: () => void, onC
 
   const handleLike = (e: React.MouseEvent) => {
     e.preventDefault();
-    e.stopPropagation();
+    e.stopPropagation();    
+    
     if (onRequireAuth) {
       onRequireAuth();
-    } else {
-      setIsLiked(!isLiked);
+      return;
     }
+    
+    setIsLiked(!isLiked);
   };
 
   const handleCommentClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    if (onRequireAuth) {
+      onRequireAuth();
+      return;
+    }
     
     if (onCommentClick) {
       onCommentClick();
@@ -39,6 +50,12 @@ export function usePostCard(id: string | number, onRequireAuth?: () => void, onC
   const handleShareClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (onRequireAuth) {
+      onRequireAuth();
+      return;
+    }
+
     setIsShareModalOpen(true);
   };
 
