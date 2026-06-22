@@ -34,24 +34,18 @@ export function ReportForm() {
   return (
     <div className="bg-white dark:bg-[#1A1A2E] rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)] w-full max-w-[400px] p-8 pt-10 relative transition-colors duration-300">
       <button className="absolute top-4 right-4 bg-gray-200 dark:bg-[#2A2A40] hover:bg-gray-300 dark:hover:bg-[#3A3A55] rounded-full w-7 h-7 flex items-center justify-center text-gray-600 dark:text-gray-300 transition-colors">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
       </button>
 
       <div className="text-center mb-8">
         <h2 className="text-[32px] font-bold text-black dark:text-[#F9F9FB] tracking-tight leading-tight">
-          {t("report.title", "Signalement")}
+          {t("report.title")}
         </h2>
       </div>
 
       {isSubmitted ? (
         <div className="text-center py-10 space-y-2">
-          <p className="text-gray-900 dark:text-[#F9F9FB] font-medium">
-            {t("report.successMsg", "Merci de votre signalement")}
-          </p>
-          <p className="text-gray-900 dark:text-[#F9F9FB]">:)</p>
+          <p className="text-gray-900 dark:text-[#F9F9FB] font-medium">{t("report.successMsg")}</p>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -63,9 +57,7 @@ export function ReportForm() {
           {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
           <div>
-            <label className="block text-sm text-gray-900 dark:text-[#F9F9FB] mb-2">
-              {t("report.reasonLabel", "Motif du signalement")}
-            </label>
+            <label className="block text-sm text-gray-900 dark:text-[#F9F9FB] mb-2">{t("report.reasonLabel")}</label>
             <div className="relative w-full">
               <select
                 className="bg-[#F3F4F6] dark:bg-[#2A2A40] text-gray-500 dark:text-[#F9F9FB] text-sm rounded-lg p-3 w-full outline-none appearance-none cursor-pointer pr-8 transition-colors"
@@ -100,7 +92,7 @@ export function ReportForm() {
           </div>
 
           <div className="mt-6 text-[8px] text-gray-500 dark:text-gray-400 leading-tight">
-            {t("report.legalWarning", "Merci de noter que le fait d'effectuer sciemment un signalement de contenu peut être puni par la loi...")}
+            {t("report.legalWarning")}
           </div>
 
           <div className="flex justify-end pt-2">
