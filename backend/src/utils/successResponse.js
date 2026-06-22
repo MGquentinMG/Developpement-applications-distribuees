@@ -6,4 +6,6 @@ const successResponse = (reply, data, message = "Succès", statusCode = 200) => 
   });
 };
 
+
+
 module.exports = successResponse;

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
-export function usePostCard(id: string | number, onRequireAuth?: () => void, onCommentClick?: () => void) {
+export function usePostCard(id: string | number, onRequireAuth?: () => void, onCommentClick?: () => void, onLike?: () => void) {
   const router = useRouter();
   const pathname = usePathname();
   const [isLiked, setIsLiked] = useState(false);
@@ -22,6 +22,7 @@ export function usePostCard(id: string | number, onRequireAuth?: () => void, onC
       onRequireAuth();
     } else {
       setIsLiked(!isLiked);
+      onLike?.();
     }
   };
 

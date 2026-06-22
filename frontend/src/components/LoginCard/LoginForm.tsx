@@ -2,6 +2,7 @@
 
 import React, { useState, FormEvent } from 'react';
 import { InputField } from './common/InputField';
+import { useAuth } from '../../contexts/AuthContext';
 
 const GoogleIcon = () => (
   <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
@@ -19,15 +20,24 @@ const UserIcon = () => (
 );
 
 export function LoginForm() {
+  const { login } = useAuth();
   const [step, setStep] = useState<1 | 2>(1);
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleIdentifierClick = () => setStep(2);
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Tentative de connexion avec:', { email, password });
+    setError('');
+    setLoading(true);
+    try {
+      await login(email, password);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Erreur de connexion');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -50,37 +60,42 @@ export function LoginForm() {
             <GoogleIcon />
             Connexion avec google
           </button>
-          <button type="button" onClick={handleIdentifierClick} className="w-full flex items-center justify-center gap-3 bg-[#F3F4F6] text-gray-800 font-medium rounded-full text-sm px-5 py-3 hover:bg-gray-200 transition-colors">
+          <button type="button" onClick={() => setStep(2)} className="w-full flex items-center justify-center gap-3 bg-[#F3F4F6] text-gray-800 font-medium rounded-full text-sm px-5 py-3 hover:bg-gray-200 transition-colors">
             <UserIcon />
             Connexion avec identifiants
           </button>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-5 px-2">
+          {error && (
+            <p className="text-red-500 text-sm text-center">{error}</p>
+          )}
           <div>
-            <label className="block text-sm text-gray-900 mb-2">
-              Adresse e-mail
-            </label>
-            <InputField 
-              type="email" 
-              placeholder="Adresse e-mail" 
+            <label className="block text-sm text-gray-900 mb-2">Adresse e-mail</label>
+            <InputField
+              type="email"
+              placeholder="Adresse e-mail"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-900 mb-2">
-              Mot de passe
-            </label>
-            <InputField 
-              type="password" 
-              placeholder="Mot de passe" 
+            <label className="block text-sm text-gray-900 mb-2">Mot de passe</label>
+            <InputField
+              type="password"
+              placeholder="Mot de passe"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
-          <button type="submit" className="w-full bg-[#A69ACA] text-white font-medium rounded-full text-sm px-5 py-3 mt-4 hover:bg-[#9084b8] transition-colors">
-            Valider
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#A69ACA] text-white font-medium rounded-full text-sm px-5 py-3 mt-4 hover:bg-[#9084b8] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {loading ? 'Connexion...' : 'Valider'}
           </button>
         </form>
       )}
@@ -92,9 +107,7 @@ export function LoginForm() {
       <div className="mt-6 pt-4 border-t border-gray-100 text-center">
         <p className="text-sm text-gray-800">
           Tu n'as pas de compte ? <br/>
-          <a href="/register" className="text-[#A69ACA] hover:underline">
-            S'inscrire
-          </a>
+          <a href="/register" className="text-[#A69ACA] hover:underline">S'inscrire</a>
         </p>
       </div>
     </div>

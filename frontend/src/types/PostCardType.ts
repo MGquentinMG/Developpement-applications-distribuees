@@ -10,4 +10,5 @@ export interface PostCardProps {
   imageUrl?: string;
   onRequireAuth?: () => void;
   onCommentClick?: () => void;
+  onLike?: () => void;
 }
