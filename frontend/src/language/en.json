@@ -105,5 +105,19 @@
     "legalWarning": "Merci de noter que le fait d'effectuer sciemment un signalement de contenu peut être puni par la loi. Si tu signales fréquemment du contenu de manière manifestement infondée, nous nous réservons le droit de suspendre ta capacité à effectuer des signalements ou de bannir définitivement ton compte.",
     "submitBtn": "Signaler",
     "successMsg": "Merci de votre signalement :)"
+  },
+  "admin": {
+    "title": "Panel d'Administration",
+    "subtitle": "Gestion des comptes et modération des contenus",
+    "searchPlaceholder": "Rechercher un pseudo ou email...",
+    "noUserFound": "Aucun utilisateur trouvé.",
+    "deleteAccount": "Supprimer le compte",
+    "registeredOn": "Inscrit le",
+    "publishedMessages": "Messages publiés",
+    "noMessages": "Cet utilisateur n'a publié aucun message.",
+    "selectUser": "Sélectionnez un utilisateur",
+    "selectUserDesc": "Pour modérer son compte et ses contenus",
+    "confirmDeleteUser": "Es-tu sûr de vouloir supprimer définitivement cet utilisateur et tous ses messages ?",
+    "confirmDeletePost": "Supprimer ce message ?"
   }
 }
