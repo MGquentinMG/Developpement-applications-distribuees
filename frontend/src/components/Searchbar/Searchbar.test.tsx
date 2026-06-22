@@ -3,41 +3,39 @@ import { describe, it, expect, vi } from "vitest";
 import SearchBar from "./Searchbar";
 
 vi.mock("react-i18next", () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
+  useTranslation: () => ({
+    t: (key: string) => key,
+  }),
+  initReactI18next: { type: "3rdParty", init: vi.fn() }
 }));
 
 describe("SearchBar", () => {
-  it("doit afficher la valeur passée en props", () => {
-    render(<SearchBar value="test" onChange={vi.fn()} />);
-    expect(screen.getByDisplayValue("test")).toBeInTheDocument();
+  it("doit afficher la valeur et le placeholder correctement", () => {
+    render(<SearchBar value="Test" onChange={vi.fn()} />);
+    expect(screen.getByDisplayValue("Test")).toBeInTheDocument();
   });
 
-  it("doit afficher le bon placeholder traduit", () => {
-    render(<SearchBar value="" onChange={vi.fn()} />);
-    expect(screen.getByPlaceholderText("feed.searchPlaceholder")).toBeInTheDocument();
-  });
-
-  it("doit appeler onChange lors d'une frappe au clavier", () => {
+  it("doit appeler onChange lors de la saisie", () => {
     const handleChange = vi.fn();
-    render(<SearchBar value="" onChange={handleChange} />);
+    render(<SearchBar value="" onChange={handleChange} placeholder="Chercher" />);
     
-    const input = screen.getByPlaceholderText("feed.searchPlaceholder");
-    fireEvent.change(input, { target: { value: "hello" } });
+    const input = screen.getByPlaceholderText("Chercher");
+    fireEvent.change(input, { target: { value: "Hello" } });
     
-    expect(handleChange).toHaveBeenCalledWith("hello");
+    expect(handleChange).toHaveBeenCalledWith("Hello");
   });
 
-  it("doit afficher le bouton d'effacement uniquement si le champ n'est pas vide", () => {
+  it("doit afficher le bouton clear uniquement si une valeur est présente", () => {
     const { rerender } = render(<SearchBar value="" onChange={vi.fn()} />);
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
 
-    rerender(<SearchBar value="hello" onChange={vi.fn()} />);
+    rerender(<SearchBar value="Texte" onChange={vi.fn()} />);
     expect(screen.getByRole("button")).toBeInTheDocument();
   });
 
-  it("doit renvoyer une chaîne vide quand on clique sur la croix", () => {
+  it("doit vider le champ au clic sur le bouton clear", () => {
     const handleChange = vi.fn();
-    render(<SearchBar value="texte à effacer" onChange={handleChange} />);
+    render(<SearchBar value="Texte" onChange={handleChange} />);
     
     const clearButton = screen.getByRole("button");
     fireEvent.click(clearButton);

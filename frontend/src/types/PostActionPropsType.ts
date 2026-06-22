@@ -1,8 +1,8 @@
-import { LucideIcon } from "lucide-react";
+import { ElementType, MouseEvent } from "react";
 
 export interface PostActionProps {
-  icon: LucideIcon;
-  count: string;
+  icon: ElementType;
+  count: string | number;
   filled?: boolean;
-  onClick?: () => void;
+  onClick: (e: MouseEvent<HTMLButtonElement>) => void;
 }

@@ -60,5 +60,32 @@
     "title": "Contacts",
     "searchPlaceholder": "Rechercher ...",
     "inputPlaceholder": "Message..."
+  },
+  "share": {
+    "title": "Partager à",
+    "sent": "Envoyé",
+    "send": "Envoyer",
+    "message": "Message",
+    "email": "Email"
+  },
+  "post": {
+    "reply": "Répondre",
+    "addComment": "Ajouter un commentaire..."
+  },
+  "profile": {
+    "subscribe": "S'abonner",
+    "edit": "Éditer",
+    "myProfile": "Mon Profil",
+    "subscriptions": "Abonnements",
+    "subscribers": "Abonnés",
+    "posts": "Breezys",
+    "replies": "Réponses",
+    "noReplies": "Aucune réponse pour le moment."
+  },
+  "button": {
+    "login": "Connexion"
+  },
+  "navbar": {
+    "createPost": "Créer un post"
   }
 }
