@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import "../i18n";
 import TopBanner from "../components/TopBanner/TopBanner";
 import ThemeSuggestions from "../components/Suggestionsbar/Suggestionsbar";
 import PostCard from "../components/PostCard/PostCard";
+import { AuthModal } from "../components/Auth/AuthModal";
 import { useTheme } from "../contexts/ThemeContext";
 import { api, timeAgo, formatCount } from "../services/api";
 
@@ -22,7 +22,6 @@ interface ApiPost {
 }
 
 export default function Home() {
-  const router = useRouter();
   const { t } = useTranslation();
   const { theme } = useTheme();
 
@@ -30,6 +29,13 @@ export default function Home() {
   const [trendingThemes, setTrendingThemes] = useState<string[]>([]);
   const [activeTheme, setActiveTheme] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<"login" | "register">("login");
+
+  const openAuthModal = (mode: "login" | "register") => {
+    setAuthMode(mode);
+    setIsAuthModalOpen(true);
+  };
 
   const VISIBLE_COUNT = 4;
   const postRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -83,7 +89,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#F9F9FB] dark:bg-[#121212] transition-colors duration-300">
-      <TopBanner />
+      <TopBanner onLoginClick={() => openAuthModal("login")} />
 
       <div className="mt-4 px-5">
         <h2 className="text-sm font-bold text-[#1E1E40] dark:text-[#F9F9FB] mb-4 transition-colors duration-300">
@@ -124,7 +130,7 @@ export default function Home() {
                 shares="0"
                 avatarUrl={post.author?.avatar}
                 imageUrl={post.image}
-                onRequireAuth={() => router.push("/login")}
+                onRequireAuth={() => openAuthModal("register")}
               />
             </div>
           ))}
@@ -149,7 +155,7 @@ export default function Home() {
         >
           <div className="pointer-events-auto">
             <button
-              onClick={() => router.push("/register")}
+              onClick={() => openAuthModal("register")}
               className="bg-[#492775] text-white dark:bg-[#A395DA] dark:text-[#1E1E40] px-8 py-3.5 rounded-full font-bold text-[14px] shadow-[0_4px_15px_rgba(73,39,117,0.3)] dark:shadow-[0_4px_15px_rgba(163,149,218,0.2)] hover:bg-[#3a1f5d] dark:hover:bg-[#8B7BB5] transition-all transform hover:scale-105 duration-300 cursor-pointer"
             >
               {t("home.signUpToSeeMore")}
@@ -157,6 +163,13 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        initialMode={authMode}
+        onSwitchMode={() => setAuthMode(authMode === "login" ? "register" : "login")}
+      />
     </main>
   );
 }

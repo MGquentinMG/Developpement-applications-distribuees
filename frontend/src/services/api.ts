@@ -88,3 +88,42 @@ export function timeAgo(dateString: string): string {
   if (diff < 604800) return `${Math.floor(diff / 86400)}j`;
   return `${Math.floor(diff / 604800)}sem`;
 }
+
+
+export interface ApiResponse<T = unknown> {
+  success: boolean;
+  message: string;
+  data?: T;
+}
+
+const API_BASE_URL = "http://localhost:3001/api";
+
+export async function handleApiCall<T>(
+  endpoint: string, 
+  method: string, 
+  data?: object
+): Promise<ApiResponse<T>> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+  };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method,
+    headers,
+    body: data ? JSON.stringify(data) : undefined,
+  });
+
+  const result: ApiResponse<T> = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Erreur lors de la requête");
+  }
+
+  return result;
+}

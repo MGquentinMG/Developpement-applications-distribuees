@@ -5,7 +5,11 @@ import { useTranslation } from "react-i18next";
 import Logo from "../Logo/Logo"; 
 import Button from "../Button/Button";
 
-export default function TopBanner() {
+interface TopBannerProps {
+  onLoginClick?: () => void;
+}
+
+export default function TopBanner({ onLoginClick }: TopBannerProps) {
   const router = useRouter();
   const { t } = useTranslation();
 
@@ -23,13 +27,13 @@ export default function TopBanner() {
             {t("topBanner.subtitle")}
           </p>
         </div>
-        
+
         <div className="flex flex-col items-end">
-          <Button 
-            label={t("topBanner.login")} 
-            isHashtag={false} 
-            variant="action" 
-            onClick={() => router.push("/login")}
+          <Button
+            label={t("topBanner.login")}
+            isHashtag={false}
+            variant="action"
+            onClick={onLoginClick ?? (() => router.push("/login"))}
           />
           <div className="w-28 h-28 mr-1 mt-3">
             <Logo />
