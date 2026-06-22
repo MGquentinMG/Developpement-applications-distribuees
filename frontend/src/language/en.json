@@ -87,5 +87,23 @@
   },
   "navbar": {
     "createPost": "Créer un post"
+  },
+
+  "report": {
+    "title": "Signalement",
+    "reasonLabel": "Motif du signalement",
+    "selectReason": "Sélectionner un motif...",
+    "reasons": {
+      "hate": "Incitation à la haine",
+      "violence": "Violence",
+      "disinfo": "Désinformation",
+      "illegal": "Activités illégales",
+      "fraud": "Fraudes",
+      "other": "Autres"
+    },
+    "descriptionLabel": "Description :",
+    "legalWarning": "Merci de noter que le fait d'effectuer sciemment un signalement de contenu peut être puni par la loi. Si tu signales fréquemment du contenu de manière manifestement infondée, nous nous réservons le droit de suspendre ta capacité à effectuer des signalements ou de bannir définitivement ton compte.",
+    "submitBtn": "Signaler",
+    "successMsg": "Merci de votre signalement :)"
   }
 }
