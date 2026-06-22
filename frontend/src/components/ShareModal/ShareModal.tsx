@@ -5,10 +5,12 @@ import { X, Copy, Check, Mail, MessageSquare } from "lucide-react";
 import { ShareModalProps } from "../../types/ModalType";
 import Avatar from "../Avatar/Avatar";
 import { useShareModal } from "../../hooks/useShareModal";
+import { useAuth } from "../../contexts/AuthContext";
 import "../../i18n";
 
 export default function ShareModal({ isOpen, onClose, url, title }: ShareModalProps) {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { copied, sentTo, handleClose, handleCopy, handleSendToContact } = useShareModal(isOpen, onClose, url);
 
   if (!isOpen) return null;
@@ -18,13 +20,7 @@ export default function ShareModal({ isOpen, onClose, url, title }: ShareModalPr
     { icon: Mail, name: t("share.email"), color: "bg-gray-500", href: `mailto:?subject=${encodeURIComponent(title || "")}&body=${encodeURIComponent(url)}` },
   ];
 
-  const mockContacts = [
-    { id: "1", username: "4theC@" },
-    { id: "2", username: "PandaRoux" },
-    { id: "3", username: "DogLover" },
-    { id: "4", username: "Garfield" },
-    { id: "5", username: "Odie" },
-  ];
+  const contacts = (user?.following ?? []) as { _id: string; username: string; avatar?: string }[];
 
   return (
     <div className="fixed inset-0 z-[100] flex justify-center items-end bg-black/50 backdrop-blur-sm transition-opacity" onClick={handleClose}>
@@ -39,37 +35,39 @@ export default function ShareModal({ isOpen, onClose, url, title }: ShareModalPr
           </button>
         </div>
 
-        <div className="flex gap-4 overflow-x-auto pb-4 mb-4 scrollbar-none [&::-webkit-scrollbar]:hidden">
-          {mockContacts.map((contact) => {
-            const isSent = sentTo.includes(contact.id);
-            return (
-              <div key={contact.id} className="flex flex-col items-center gap-2 min-w-[72px]">
-                <div className="relative w-14 h-14">
-                  <Avatar alt={contact.username} />
-                  {isSent && (
-                    <div className="absolute bottom-0 right-0 w-5 h-5 bg-[#009650] border-2 border-white dark:border-[#1A1A2E] rounded-full flex items-center justify-center">
-                      <Check size={12} className="text-white" strokeWidth={3} />
-                    </div>
-                  )}
+        {contacts.length > 0 && (
+          <div className="flex gap-4 overflow-x-auto pb-4 mb-4 scrollbar-none [&::-webkit-scrollbar]:hidden">
+            {contacts.map((contact) => {
+              const isSent = sentTo.includes(contact._id);
+              return (
+                <div key={contact._id} className="flex flex-col items-center gap-2 min-w-[72px]">
+                  <div className="relative w-14 h-14">
+                    <Avatar src={contact.avatar} alt={contact.username} />
+                    {isSent && (
+                      <div className="absolute bottom-0 right-0 w-5 h-5 bg-[#009650] border-2 border-white dark:border-[#1A1A2E] rounded-full flex items-center justify-center">
+                        <Check size={12} className="text-white" strokeWidth={3} />
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-[11px] text-[#1E1E40] dark:text-[#F9F9FB] font-medium truncate w-full text-center">
+                    {contact.username}
+                  </span>
+                  <button
+                    onClick={() => handleSendToContact(contact._id)}
+                    disabled={isSent}
+                    className={`text-[11px] font-bold px-4 py-1.5 rounded-full transition-colors w-full cursor-pointer ${
+                      isSent
+                        ? "bg-gray-100 dark:bg-[#2A2438] text-gray-400 dark:text-gray-500"
+                        : "bg-[#492775] text-white hover:bg-[#3a1f5d]"
+                    }`}
+                  >
+                    {isSent ? t("share.sent") : t("share.send")}
+                  </button>
                 </div>
-                <span className="text-[11px] text-[#1E1E40] dark:text-[#F9F9FB] font-medium truncate w-full text-center">
-                  {contact.username}
-                </span>
-                <button 
-                  onClick={() => handleSendToContact(contact.id)}
-                  disabled={isSent}
-                  className={`text-[11px] font-bold px-4 py-1.5 rounded-full transition-colors w-full cursor-pointer ${
-                    isSent 
-                      ? "bg-gray-100 dark:bg-[#2A2438] text-gray-400 dark:text-gray-500" 
-                      : "bg-[#492775] text-white hover:bg-[#3a1f5d]"
-                  }`}
-                >
-                  {isSent ? t("share.sent") : t("share.send")}
-                </button>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
 
         <div className="h-[1px] w-full bg-gray-100 dark:bg-[#2A2438] mb-6"></div>
 

@@ -16,6 +16,7 @@ interface ApiMessage {
   sender: string;
   recipient: string;
   content: string;
+  imageUrl?: string;
   createdAt: string;
 }
 
@@ -53,6 +54,8 @@ export default function ConversationPage() {
             content: m.content,
             isSelf: m.sender === user._id,
             author: m.sender !== user._id ? recipient?.username : undefined,
+            isImage: !!m.imageUrl,
+            imageUrl: m.imageUrl,
           }))
         );
       })
@@ -78,9 +81,25 @@ export default function ConversationPage() {
     }
   };
 
-  const handleImageSelect = (file: File) => {
-    const blobUrl = URL.createObjectURL(file);
-    setChat((prev) => [...prev, { content: "", isSelf: true, isImage: true, imageUrl: blobUrl }]);
+  const handleImageSelect = async (file: File) => {
+    if (!recipientId || sending) return;
+    setSending(true);
+    const tempUrl = URL.createObjectURL(file);
+    setChat((prev) => [...prev, { content: "", isSelf: true, isImage: true, imageUrl: tempUrl }]);
+    try {
+      const permanentUrl = await api.uploadImage(file);
+      await api.post("/api/messages", { recipientId, imageUrl: permanentUrl });
+      setChat((prev) =>
+        prev.map((m, i) =>
+          i === prev.length - 1 ? { ...m, imageUrl: permanentUrl } : m
+        )
+      );
+    } catch {
+      setChat((prev) => prev.slice(0, -1));
+    } finally {
+      URL.revokeObjectURL(tempUrl);
+      setSending(false);
+    }
   };
 
   return (

@@ -59,6 +59,19 @@ export const api = {
   patch: <T>(path: string, body: unknown) =>
     request<T>(path, { method: "PATCH", body: JSON.stringify(body) }),
   delete: <T>(path: string) => request<T>(path, { method: "DELETE" }),
+  uploadImage: async (file: File): Promise<string> => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch(`${API_URL}/api/upload/image`, {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData,
+    });
+    const json = await res.json() as { data?: { url: string }; success?: boolean };
+    if (!res.ok || !json.data?.url) throw new Error("Échec de l'upload");
+    return `${API_URL}${json.data.url}`;
+  },
 };
 
 export function formatCount(n: number): string {
