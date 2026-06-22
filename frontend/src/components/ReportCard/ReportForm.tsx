@@ -2,29 +2,37 @@
 
 import React, { useState, FormEvent, ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
-import "../../i18n"; // Ton import i18n
-import { InputField } from "../LoginCard/common/InputField"; 
+import "../../i18n";
+import { InputField } from "../LoginCard/common/InputField";
+import { api } from "../../services/api";
+import { useAuth } from "../../contexts/AuthContext";
 
 export function ReportForm() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [reason, setReason] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
+  const [reason, setReason] = useState("");
+  const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    setReason(e.target.value);
-  };
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!reason) return;
-    console.log("Signalement envoyé:", { reason, description });
-    setIsSubmitted(true);
+    setError("");
+    setLoading(true);
+    try {
+      await api.post("/api/reports", { reason, description });
+      setIsSubmitted(true);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Erreur lors du signalement");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="bg-white dark:bg-[#1A1A2E] rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)] w-full max-w-[400px] p-8 pt-10 relative transition-colors duration-300">
-      
       <button className="absolute top-4 right-4 bg-gray-200 dark:bg-[#2A2A40] hover:bg-gray-300 dark:hover:bg-[#3A3A55] rounded-full w-7 h-7 flex items-center justify-center text-gray-600 dark:text-gray-300 transition-colors">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -47,15 +55,22 @@ export function ReportForm() {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-5">
+          {!user && (
+            <p className="text-amber-500 text-sm text-center">
+              {t("report.loginWarning", "Tu dois être connecté pour signaler du contenu.")}
+            </p>
+          )}
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+
           <div>
             <label className="block text-sm text-gray-900 dark:text-[#F9F9FB] mb-2">
               {t("report.reasonLabel", "Motif du signalement")}
             </label>
             <div className="relative w-full">
-              <select 
-                className="bg-[#F3F4F6] dark:bg-[#2A2A40] text-gray-500 dark:text-[#F9F9FB] text-sm rounded-lg p-3 w-full outline-none appearance-none cursor-pointer pr-8 transition-colors" 
-                value={reason} 
-                onChange={handleSelectChange}
+              <select
+                className="bg-[#F3F4F6] dark:bg-[#2A2A40] text-gray-500 dark:text-[#F9F9FB] text-sm rounded-lg p-3 w-full outline-none appearance-none cursor-pointer pr-8 transition-colors"
+                value={reason}
+                onChange={(e: ChangeEvent<HTMLSelectElement>) => setReason(e.target.value)}
                 required
               >
                 <option value="" disabled hidden>{t("report.selectReason", "Sélectionner un motif...")}</option>
@@ -76,24 +91,25 @@ export function ReportForm() {
             <label className="block text-sm text-gray-900 dark:text-[#F9F9FB] mb-2">
               {t("report.descriptionLabel", "Description :")}
             </label>
-            <InputField 
-              type="text" 
-              placeholder="..." 
+            <InputField
+              type="text"
+              placeholder="..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
-          
+
           <div className="mt-6 text-[8px] text-gray-500 dark:text-gray-400 leading-tight">
             {t("report.legalWarning", "Merci de noter que le fait d'effectuer sciemment un signalement de contenu peut être puni par la loi...")}
           </div>
 
           <div className="flex justify-end pt-2">
-            <button 
-              type="submit" 
-              className="bg-[#A69ACA] text-white font-medium rounded-full text-sm px-6 py-2 hover:bg-[#9084b8] transition-colors"
+            <button
+              type="submit"
+              disabled={loading || !user}
+              className="bg-[#A69ACA] text-white font-medium rounded-full text-sm px-6 py-2 hover:bg-[#9084b8] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {t("report.submitBtn", "Signaler")}
+              {loading ? t("report.sending", "Envoi...") : t("report.submitBtn", "Signaler")}
             </button>
           </div>
         </form>

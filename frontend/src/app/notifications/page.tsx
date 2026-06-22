@@ -1,29 +1,69 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import "../../i18n";
 import BackButton from "../../components/BackButton/BackButton";
 import NotificationCard from "../../components/NotificationCard/NotificationCard";
 import { NotificationProps } from "../../types/NotificationType";
 import Logo from "../../components/Logo/Logo";
+import { api } from "../../services/api";
+import { useAuth } from "../../contexts/AuthContext";
+
+interface ApiNotification {
+  _id: string;
+  type: string;
+  relatedUser?: { _id: string; username: string; avatar?: string };
+  read: boolean;
+  createdAt: string;
+}
+
+function mapType(type: string): NotificationProps["action"] {
+  if (type === "follow") return "follow";
+  if (type === "like") return "like";
+  if (type === "comment") return "comment";
+  return "share";
+}
 
 export default function NotificationsPage() {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const [notifications, setNotifications] = useState<ApiNotification[]>([]);
   const [filter, setFilter] = useState<"new" | "all">("new");
+  const [loading, setLoading] = useState(true);
 
-  const mockNotifications: NotificationProps[] = [
-    { id: 1, username: "@Pessi", action: "follow", time: "17:21", isRead: false },
-    { id: 2, username: "@Ambroise", action: "like", time: "17:02", isRead: true },
-    { id: 3, username: "@aurel62", action: "comment", time: "17:01", isRead: false },
-    { id: 4, username: "@hakam", action: "share", time: "17:22", isRead: true },
-    { id: 5, username: "@Ambroise", action: "like", time: "17:02", isRead: false },
-    { id: 6, username: "@Manu", action: "share", time: "17:22", isRead: true },
-  ];
+  useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    api
+      .get<ApiNotification[]>("/api/notifications")
+      .then((data) => setNotifications(Array.isArray(data) ? data : []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [user]);
 
-  const filteredNotifications = filter === "new"
-    ? mockNotifications.filter((n) => !n.isRead)
-    : mockNotifications;
+  const handleMarkRead = async (id: string | number) => {
+    try {
+      await api.patch(`/api/notifications/${id}`, {});
+      setNotifications((prev) =>
+        prev.map((n) => (n._id === id ? { ...n, read: true } : n))
+      );
+    } catch {}
+  };
+
+  const filtered = filter === "new"
+    ? notifications.filter((n) => !n.read)
+    : notifications;
+
+  const toProps = (n: ApiNotification): NotificationProps => ({
+    id: n._id,
+    username: n.relatedUser ? `@${n.relatedUser.username}` : "@inconnu",
+    action: mapType(n.type),
+    time: new Date(n.createdAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }),
+    isRead: n.read,
+  });
 
   return (
     <main className="min-h-screen bg-[#F9F9FB] dark:bg-[#121212] pb-32 relative transition-colors duration-300">
@@ -32,7 +72,9 @@ export default function NotificationsPage() {
           <Logo />
         </div>
         <div className="bg-[#EAE5F3] dark:bg-[#2A2438] px-6 py-2 rounded-2xl transition-colors duration-300">
-          <h1 className="text-[#1E1E40] dark:text-[#F9F9FB] font-bold text-sm transition-colors duration-300">{t("notifications.title")}</h1>
+          <h1 className="text-[#1E1E40] dark:text-[#F9F9FB] font-bold text-sm transition-colors duration-300">
+            {t("notifications.title")}
+          </h1>
         </div>
         <div className="w-10"></div>
       </div>
@@ -45,8 +87,8 @@ export default function NotificationsPage() {
         <button
           onClick={() => setFilter("new")}
           className={`px-5 py-1.5 rounded-full text-sm font-semibold transition-colors duration-300 ${
-            filter === "new" 
-              ? "bg-[#A395DA] text-white shadow-sm dark:bg-[#492775] dark:text-[#D0C9E8]" 
+            filter === "new"
+              ? "bg-[#A395DA] text-white shadow-sm dark:bg-[#492775] dark:text-[#D0C9E8]"
               : "bg-[#EAE5F3] text-[#492775] dark:bg-[#2A2438] dark:text-[#A395DA]"
           }`}
         >
@@ -55,8 +97,8 @@ export default function NotificationsPage() {
         <button
           onClick={() => setFilter("all")}
           className={`px-5 py-1.5 rounded-full text-sm font-semibold transition-colors duration-300 ${
-            filter === "all" 
-              ? "bg-[#A395DA] text-white shadow-sm dark:bg-[#492775] dark:text-[#D0C9E8]" 
+            filter === "all"
+              ? "bg-[#A395DA] text-white shadow-sm dark:bg-[#492775] dark:text-[#D0C9E8]"
               : "bg-[#EAE5F3] text-[#492775] dark:bg-[#2A2438] dark:text-[#A395DA]"
           }`}
         >
@@ -65,18 +107,25 @@ export default function NotificationsPage() {
       </div>
 
       <section className="px-4 relative z-10">
-        {filteredNotifications.map((notif) => (
-          <NotificationCard
-            key={notif.id}
-            id={notif.id}
-            username={notif.username}
-            action={notif.action}
-            time={notif.time}
-            isRead={notif.isRead}
-          />
+        {loading && (
+          <p className="text-center text-gray-400 dark:text-gray-500 mt-10 text-sm">
+            Chargement...
+          </p>
+        )}
+
+        {!loading && !user && (
+          <p className="text-center text-gray-400 dark:text-gray-500 mt-10 text-sm">
+            {t("notifications.loginRequired", "Connecte-toi pour voir tes notifications.")}
+          </p>
+        )}
+
+        {!loading && user && filtered.map((notif) => (
+          <div key={notif._id} onClick={() => !notif.read && handleMarkRead(notif._id)}>
+            <NotificationCard {...toProps(notif)} />
+          </div>
         ))}
 
-        {filteredNotifications.length === 0 && (
+        {!loading && user && filtered.length === 0 && (
           <p className="text-center text-gray-400 dark:text-gray-500 mt-10 text-sm transition-colors duration-300">
             {t("notifications.empty")}
           </p>

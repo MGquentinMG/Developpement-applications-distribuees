@@ -2,6 +2,7 @@
 
 import React, { useState, FormEvent, ChangeEvent } from 'react';
 import { InputField } from './common/InputField';
+import { useAuth } from '../../contexts/AuthContext';
 
 const GoogleIcon = () => (
   <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
@@ -18,29 +19,46 @@ const UserIcon = () => (
   </svg>
 );
 
-export function RegisterForm() {
-  const [step, setStep] = useState<1 | 2>(1);
-  const [pseudo, setPseudo] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [day, setDay] = useState<string>('');
-  const [month, setMonth] = useState<string>('');
-  const [year, setYear] = useState<string>('');
-  const [acceptTerms, setAcceptTerms] = useState<boolean>(false);
+function calcAge(day: string, month: string, year: string): number {
+  const dob = new Date(Number(year), Number(month) - 1, Number(day));
+  const today = new Date();
+  let age = today.getFullYear() - dob.getFullYear();
+  const m = today.getMonth() - dob.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+  return age;
+}
 
-  const handleEmailClick = () => setStep(2);
+export function RegisterForm() {
+  const { register } = useAuth();
+  const [step, setStep] = useState<1 | 2>(1);
+  const [pseudo, setPseudo] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [day, setDay] = useState('');
+  const [month, setMonth] = useState('');
+  const [year, setYear] = useState('');
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSelectChange = (
-    e: ChangeEvent<HTMLSelectElement>, 
+    e: ChangeEvent<HTMLSelectElement>,
     setter: React.Dispatch<React.SetStateAction<string>>
-  ) => {
-    setter(e.target.value);
-  };
+  ) => setter(e.target.value);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!acceptTerms) return; // Sécurité supplémentaire
-    console.log('Soumission:', { pseudo, email, password, dob: `${year}-${month}-${day}`, acceptTerms });
+    if (!acceptTerms) return;
+    setError('');
+    setLoading(true);
+    try {
+      const age = calcAge(day, month, year);
+      await register({ username: pseudo, email, password, age });
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Erreur lors de l'inscription");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -63,45 +81,28 @@ export function RegisterForm() {
             <GoogleIcon />
             Inscription avec google
           </button>
-          <button type="button" onClick={handleEmailClick} className="w-full flex items-center justify-center gap-3 bg-[#F3F4F6] text-gray-800 font-medium rounded-full text-sm px-5 py-3 hover:bg-gray-200 transition-colors">
+          <button type="button" onClick={() => setStep(2)} className="w-full flex items-center justify-center gap-3 bg-[#F3F4F6] text-gray-800 font-medium rounded-full text-sm px-5 py-3 hover:bg-gray-200 transition-colors">
             <UserIcon />
             Inscription avec e-mail
           </button>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4 px-2">
-          
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+
           <div>
             <label className="block text-sm text-gray-900 mb-1">Pseudo</label>
-            <InputField 
-              type="text" 
-              placeholder="Ton pseudo" 
-              value={pseudo}
-              onChange={(e) => setPseudo(e.target.value)}
-              required
-            />
+            <InputField type="text" placeholder="Ton pseudo" value={pseudo} onChange={(e) => setPseudo(e.target.value)} required />
           </div>
 
           <div>
             <label className="block text-sm text-gray-900 mb-1">Quelle est ton adresse e-mail ?</label>
-            <InputField 
-              type="email" 
-              placeholder="Adresse e-mail" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+            <InputField type="email" placeholder="Adresse e-mail" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
 
           <div>
             <label className="block text-sm text-gray-900 mb-1">Mot de passe</label>
-            <InputField 
-              type="password" 
-              placeholder="Mot de passe" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <InputField type="password" placeholder="Mot de passe" value={password} onChange={(e) => setPassword(e.target.value)} required />
           </div>
 
           <div>
@@ -110,7 +111,7 @@ export function RegisterForm() {
               <div className="relative w-full">
                 <select className="bg-[#F3F4F6] text-gray-500 text-sm rounded-lg p-2.5 w-full outline-none appearance-none cursor-pointer pr-8" value={day} onChange={(e) => handleSelectChange(e, setDay)} required>
                   <option value="">Jour</option>
-                  {Array.from({length: 31}, (_, i) => <option key={i+1} value={i+1}>{i+1}</option>)}
+                  {Array.from({ length: 31 }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1}</option>)}
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-600">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -119,7 +120,7 @@ export function RegisterForm() {
               <div className="relative w-full">
                 <select className="bg-[#F3F4F6] text-gray-500 text-sm rounded-lg p-2.5 w-full outline-none appearance-none cursor-pointer pr-8" value={month} onChange={(e) => handleSelectChange(e, setMonth)} required>
                   <option value="">Mois</option>
-                  {['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'].map((m, i) => <option key={i+1} value={i+1}>{m}</option>)}
+                  {['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'].map((m, i) => <option key={i + 1} value={i + 1}>{m}</option>)}
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-600">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -128,7 +129,7 @@ export function RegisterForm() {
               <div className="relative w-full">
                 <select className="bg-[#F3F4F6] text-gray-500 text-sm rounded-lg p-2.5 w-full outline-none appearance-none cursor-pointer pr-8" value={year} onChange={(e) => handleSelectChange(e, setYear)} required>
                   <option value="">Année</option>
-                  {Array.from({length: 100}, (_, i) => { const y = new Date().getFullYear() - i; return <option key={y} value={y}>{y}</option> })}
+                  {Array.from({ length: 100 }, (_, i) => { const y = new Date().getFullYear() - i; return <option key={y} value={y}>{y}</option>; })}
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-600">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -137,11 +138,10 @@ export function RegisterForm() {
             </div>
           </div>
 
-          {/* Nouvelle section de Checkbox */}
           <div className="flex items-start gap-2 pt-2">
-            <input 
-              type="checkbox" 
-              id="terms" 
+            <input
+              type="checkbox"
+              id="terms"
               className="mt-1 w-4 h-4 text-[#A69ACA] bg-gray-100 border-gray-300 rounded focus:ring-[#A69ACA] cursor-pointer"
               checked={acceptTerms}
               onChange={(e) => setAcceptTerms(e.target.checked)}
@@ -151,14 +151,17 @@ export function RegisterForm() {
               J'accepte les Conditions d'utilisation de BREEZY et confirme avoir lu la Politique de confidentialité.
             </label>
           </div>
-          
-          <button type="submit" className="w-full bg-[#A69ACA] text-white font-medium rounded-full text-sm px-5 py-3 mt-2 hover:bg-[#9084b8] transition-colors">
-            Valider
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#A69ACA] text-white font-medium rounded-full text-sm px-5 py-3 mt-2 hover:bg-[#9084b8] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {loading ? 'Inscription...' : 'Valider'}
           </button>
         </form>
       )}
 
-      {/* Le texte légal en petit est masqué à l'étape 2 puisqu'il est dans la checkbox */}
       {step === 1 && (
         <div className="mt-8 text-center text-[8px] text-gray-500 px-8 leading-tight">
           En continuant, tu acceptes les Conditions d'utilisation de BREEZY et confirmes avoir lu la Politique de confidentialité de BREEZY.
@@ -168,9 +171,7 @@ export function RegisterForm() {
       <div className="mt-6 pt-4 border-t border-gray-100 text-center">
         <p className="text-sm text-gray-800">
           Tu as déjà un compte ? <br/>
-          <a href="/login" className="text-[#A69ACA] hover:underline">
-            Se connecter
-          </a>
+          <a href="/login" className="text-[#A69ACA] hover:underline">Se connecter</a>
         </p>
       </div>
     </div>

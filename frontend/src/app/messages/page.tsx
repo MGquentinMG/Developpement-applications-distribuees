@@ -1,24 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import "../../i18n";
 import Logo from "../../components/Logo/Logo";
-import MessageListCard from "../../components/MessageListCard/MessageListCard";
 import SearchBar from "../../components/Searchbar/Searchbar";
-import { ConversationListProps } from "../../types/MessageType";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function MessagesPage() {
   const { t } = useTranslation();
+  const router = useRouter();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const mockConversations: ConversationListProps[] = [
-    { id: "1", author: "4theC@", timeAgo: "2h", preview: "j'aime beaucoup les chiots ...", isUnread: true },
-    { id: "2", author: "4theC@", timeAgo: "2h", preview: "j'aime beaucoup les chiots ...", isUnread: true },
-    { id: "3", author: "4theC@", timeAgo: "2h", preview: "j'aime beaucoup les chiots ...", isUnread: true },
-    { id: "4", author: "4theC@", timeAgo: "2h", preview: "j'aime beaucoup les chiots ...", isUnread: true },
-  ];
+  const contacts = useMemo(() => {
+    if (!user) return [];
+    return user.following;
+  }, [user]);
+
+  const filteredContacts = useMemo(() => {
+    if (!searchQuery.trim()) return contacts;
+    const q = searchQuery.toLowerCase();
+    return contacts.filter((c) => c.username.toLowerCase().includes(q));
+  }, [contacts, searchQuery]);
+
+  if (!user) {
+    return (
+      <main className="min-h-screen bg-white dark:bg-[#121212] pb-32 flex items-center justify-center transition-colors duration-300">
+        <p className="text-gray-400 dark:text-gray-500 text-sm">
+          {t("messages.loginRequired", "Connecte-toi pour accéder aux messages.")}
+        </p>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-white dark:bg-[#121212] pb-32 transition-colors duration-300">
@@ -26,11 +41,11 @@ export default function MessagesPage() {
         <div className="shrink-0 w-8">
           <Logo />
         </div>
-        <SearchBar 
-          value={searchQuery} 
-          onChange={setSearchQuery} 
-          variant="messages" 
-          placeholder={t("messages.searchPlaceholder")} 
+        <SearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          variant="messages"
+          placeholder={t("messages.searchPlaceholder")}
         />
       </div>
 
@@ -38,19 +53,40 @@ export default function MessagesPage() {
         <h2 className="text-[#492775] dark:text-[#A395DA] font-medium text-sm mb-4 transition-colors duration-300">
           {t("messages.title")}
         </h2>
-        
-        <div className="flex flex-col">
-          {mockConversations.map((conv, index) => (
-            <MessageListCard
-              key={index}
-              id={conv.id}
-              author={conv.author}
-              timeAgo={conv.timeAgo}
-              preview={conv.preview}
-              isUnread={conv.isUnread}
-              avatarUrl={conv.avatarUrl}
-            />
-          ))}
+
+        {filteredContacts.length === 0 && (
+          <p className="text-gray-400 dark:text-gray-500 text-sm text-center mt-10">
+            {searchQuery
+              ? t("messages.noResults", "Aucun résultat.")
+              : t("messages.noContacts", "Abonne-toi à des personnes pour démarrer une conversation.")}
+          </p>
+        )}
+
+        <div className="flex flex-col divide-y divide-gray-100 dark:divide-gray-800">
+          {filteredContacts.map((contact) => {
+            const avatar =
+              contact.avatar ||
+              `https://api.dicebear.com/7.x/avataaars/svg?seed=${contact.username}`;
+            return (
+              <button
+                key={contact._id}
+                onClick={() => router.push(`/messages/${contact._id}`)}
+                className="flex items-center gap-3 py-3 hover:bg-gray-50 dark:hover:bg-[#1A1A2E] transition-colors text-left rounded-xl px-2"
+              >
+                <div className="w-11 h-11 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 shrink-0">
+                  <img src={avatar} alt={contact.username} className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm text-[#1E1E40] dark:text-[#F9F9FB] truncate">
+                    @{contact.username}
+                  </p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 truncate">
+                    {t("messages.tapToConversation", "Appuie pour démarrer la conversation")}
+                  </p>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
     </main>
