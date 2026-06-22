@@ -23,6 +23,19 @@ module.exports = async function (fastify, opts) {
   );
 
 
+  fastify.get("/by-username/:username", async (req, reply) => {
+    try {
+      const user = await User.findOne({ username: req.params.username })
+        .select("-password")
+        .populate("followers", "username avatar")
+        .populate("following", "username avatar");
+      if (!user) return errorResponse(reply, "User non trouvé", 404);
+      return successResponse(reply, user);
+    } catch (err) {
+      return errorResponse(reply, "Erreur", 500);
+    }
+  });
+
   fastify.get("/:id", async (req, reply) => {
     try {
       const user = await User.findById(req.params.id)

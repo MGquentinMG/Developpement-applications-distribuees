@@ -59,7 +59,12 @@
   "messages": {
     "title": "Contacts",
     "searchPlaceholder": "Rechercher ...",
-    "inputPlaceholder": "Message..."
+    "inputPlaceholder": "Message...",
+    "loginRequired": "Connecte-toi pour accéder à tes messages.",
+    "noContacts": "Abonne-toi à des personnes pour démarrer une conversation.",
+    "noResults": "Aucun résultat.",
+    "tapToConversation": "Appuie pour démarrer la conversation",
+    "today": "Aujourd'hui"
   },
   "share": {
     "title": "Partager à",
@@ -73,14 +78,24 @@
     "addComment": "Ajouter un commentaire..."
   },
   "profile": {
+    "logout": "Déconnexion",
     "subscribe": "S'abonner",
     "edit": "Éditer",
     "myProfile": "Mon Profil",
     "subscriptions": "Abonnements",
     "subscribers": "Abonnés",
-    "posts": "Breezys",
+    "followers": "Abonnés",
+    "following": "Abonnements",
+    "posts": "Posts",
+    "tabs": {
+      "messages": "Posts",
+      "replies": "Réponses"
+    },
     "replies": "Réponses",
-    "noReplies": "Aucune réponse pour le moment."
+    "noReplies": "Aucune réponse pour le moment.",
+    "noPosts": "Aucun post pour le moment.",
+    "noComments": "Aucun commentaire pour le moment.",
+    "commentsTitle": "Commentaires"
   },
   "button": {
     "login": "Connexion"
@@ -88,7 +103,30 @@
   "navbar": {
     "createPost": "Créer un post"
   },
-
+  "auth": {
+    "loginTitle": "Connecte-toi à",
+    "registerTitle": "Inscription à",
+    "googleLogin": "Connexion avec Google",
+    "emailLogin": "Connexion avec identifiants",
+    "googleRegister": "Inscription avec Google",
+    "emailRegister": "Inscription avec e-mail",
+    "emailLabel": "Adresse e-mail",
+    "passwordLabel": "Mot de passe",
+    "pseudoLabel": "Pseudo",
+    "pseudoPlaceholder": "Ton pseudo",
+    "dobLabel": "Quelle est ta date de naissance ?",
+    "day": "Jour",
+    "month": "Mois",
+    "year": "Année",
+    "terms": "J'accepte les Conditions d'utilisation de BREEZY et confirme avoir lu la Politique de confidentialité.",
+    "termsShort": "En continuant, tu acceptes les Conditions d'utilisation de BREEZY et confirmes avoir lu la Politique de confidentialité de BREEZY.",
+    "submit": "Valider",
+    "noAccount": "Tu n'as pas de compte ?",
+    "hasAccount": "Tu as déjà un compte ?",
+    "signUp": "S'inscrire",
+    "signIn": "Se connecter",
+    "loading": "Chargement..."
+  },
   "report": {
     "title": "Signalement",
     "reasonLabel": "Motif du signalement",
