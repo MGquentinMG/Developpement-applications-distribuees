@@ -32,6 +32,7 @@ export default function FeedPage() {
   const [activeTheme, setActiveTheme] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<"all" | "following">("all");
 
   useEffect(() => {
     api
@@ -55,8 +56,14 @@ export default function FeedPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const followingIds = useMemo(
+    () => new Set((user?.following ?? []).map((f) => f._id)),
+    [user]
+  );
+
   const filteredPosts = useMemo(() => {
     let result = posts;
+    if (activeTab === "following") result = result.filter((p) => followingIds.has(p.author._id));
     if (activeTheme) result = result.filter((p) => p.tags.includes(activeTheme));
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().replace(/^#/, "");
@@ -68,7 +75,25 @@ export default function FeedPage() {
       );
     }
     return result;
-  }, [activeTheme, searchQuery, posts]);
+  }, [activeTab, activeTheme, searchQuery, posts, followingIds]);
+
+  const handleLike = async (id: string) => {
+    try {
+      await api.post(`/api/posts/${id}/like`, {});
+      setPosts((prev) =>
+        prev.map((p) => {
+          if (p._id !== id) return p;
+          const alreadyLiked = user ? p.likes.includes(user._id) : false;
+          return {
+            ...p,
+            likes: alreadyLiked
+              ? p.likes.filter((uid) => uid !== user?._id)
+              : [...p.likes, user?._id ?? ""],
+          };
+        })
+      );
+    } catch {}
+  };
 
   return (
     <main className="min-h-screen bg-[#F9F9FB] dark:bg-[#121212] pb-32 transition-colors duration-300">
@@ -107,6 +132,29 @@ export default function FeedPage() {
         />
       </div>
 
+      <div className="flex px-5 border-b border-gray-200 dark:border-gray-800 mt-3">
+        <button
+          onClick={() => setActiveTab("all")}
+          className={`flex-1 py-2.5 text-[13px] font-bold transition-all border-b-2 -mb-[2px] ${
+            activeTab === "all"
+              ? "border-[#492775] text-[#492775] dark:text-[#A395DA] dark:border-[#A395DA]"
+              : "border-transparent text-gray-400 dark:text-gray-500 hover:text-[#492775] dark:hover:text-[#A395DA]"
+          }`}
+        >
+          Tout
+        </button>
+        <button
+          onClick={() => setActiveTab("following")}
+          className={`flex-1 py-2.5 text-[13px] font-bold transition-all border-b-2 -mb-[2px] ${
+            activeTab === "following"
+              ? "border-[#492775] text-[#492775] dark:text-[#A395DA] dark:border-[#A395DA]"
+              : "border-transparent text-gray-400 dark:text-gray-500 hover:text-[#492775] dark:hover:text-[#A395DA]"
+          }`}
+        >
+          Abonnements
+        </button>
+      </div>
+
       <section className="px-4 pt-4">
         {loading && (
           <p className="text-center text-gray-400 dark:text-gray-500 mt-10 text-sm">
@@ -122,20 +170,22 @@ export default function FeedPage() {
               author={post.author?.username ?? "Anonyme"}
               timeAgo={timeAgo(post.createdAt)}
               content={post.content}
-              
-              likes={post.likes.length} 
-              
+              likes={formatCount(post.likes.length)}
               comments={formatCount(post.comments.length)}
               shares="0"
               avatarUrl={post.author?.avatar}
               imageUrl={post.image}
+              isLiked={user ? post.likes.includes(user._id) : false}
+              onLike={user ? () => handleLike(post._id) : undefined}
               onRequireAuth={!user ? () => router.push("/login") : undefined}
             />
           ))}
 
         {!loading && filteredPosts.length === 0 && (
           <p className="text-center text-gray-400 dark:text-gray-500 mt-10 text-sm transition-colors duration-300">
-            {t("feed.noPosts")}
+            {activeTab === "following"
+              ? "Abonne-toi à des personnes pour voir leurs posts ici."
+              : t("feed.noPosts")}
           </p>
         )}
       </section>

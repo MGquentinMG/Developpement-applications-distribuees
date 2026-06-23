@@ -15,7 +15,7 @@ import { useAuth } from "../../contexts/AuthContext";
 export default function SettingsPage() {
   const { t, i18n } = useTranslation();
   const { theme, toggleTheme } = useTheme();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   
   const [notifLikes, setNotifLikes] = useState(true);
   const [notifComments, setNotifComments] = useState(true);
@@ -119,7 +119,7 @@ export default function SettingsPage() {
           </div>
         </AccordionItem>
 
-        <button className="text-left py-4 text-[#E50000] dark:text-[#FF6B6B] font-bold text-[17px] mt-2 hover:bg-gray-50 dark:hover:bg-[#1A1A2E] transition-colors">
+        <button onClick={logout} className="text-left py-4 text-[#E50000] dark:text-[#FF6B6B] font-bold text-[17px] mt-2 hover:bg-gray-50 dark:hover:bg-[#1A1A2E] transition-colors">
           {t("settings.signOut")}
         </button>
         
