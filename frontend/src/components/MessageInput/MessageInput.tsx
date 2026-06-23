@@ -5,9 +5,14 @@ import { MessageInputProps } from "../../types/MessageType";
 import { useMessageInput } from "../../hooks/useMessageInput";
 
 export default function MessageInput({ value, onChange, onSend, placeholder, disabled, onImageSelect, imagePreview, onRemoveImage }: MessageInputProps) {
-  const { fileInputRef, handleKeyPress, handleImageClick, handleFileChange } = useMessageInput(value, onSend, onImageSelect);
+  const { fileInputRef, textareaRef, adjustHeight, handleKeyPress, handleImageClick, handleFileChange } = useMessageInput(value, onSend, onImageSelect);
 
   const canSend = !!value.trim() || !!imagePreview;
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onChange(e.target.value);
+    adjustHeight();
+  };
 
   return (
     <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto z-30 pb-6 px-4 pt-4 bg-[#FDFDFD] dark:bg-[#121212] transition-colors duration-300">
@@ -25,16 +30,18 @@ export default function MessageInput({ value, onChange, onSend, placeholder, dis
         </div>
       )}
 
-      <div className="flex items-center gap-3 bg-[#F3F0FF] dark:bg-[#1A1A2E] shadow-[0_4px_20px_rgba(0,0,0,0.05)] dark:shadow-none rounded-full px-5 py-3.5 transition-colors duration-300 border border-white dark:border-[#2A2438]">
-        <input
+      <div className="flex items-end gap-3 bg-[#F3F0FF] dark:bg-[#1A1A2E] shadow-[0_4px_20px_rgba(0,0,0,0.05)] dark:shadow-none rounded-3xl px-5 py-3.5 transition-colors duration-300 border border-white dark:border-[#2A2438]">
+        <textarea
+          ref={textareaRef}
           id="message-input"
-          type="text"
+          rows={1}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={handleChange}
           onKeyDown={handleKeyPress}
           placeholder={placeholder}
           disabled={disabled}
-          className="flex-1 bg-transparent outline-none text-[#1E1E40] dark:text-[#F9F9FB] placeholder-[#8B7BB5] dark:placeholder-[#6B5B8B] text-[15px] transition-colors duration-300 disabled:opacity-50"
+          className="flex-1 bg-transparent outline-none text-[#1E1E40] dark:text-[#F9F9FB] placeholder-[#8B7BB5] dark:placeholder-[#6B5B8B] text-[15px] transition-colors duration-300 disabled:opacity-50 resize-none overflow-hidden leading-relaxed"
+          style={{ maxHeight: "140px", overflowY: "auto" }}
         />
 
         <input
@@ -46,7 +53,7 @@ export default function MessageInput({ value, onChange, onSend, placeholder, dis
           data-testid="file-input"
         />
 
-        <div className="flex items-center gap-2 pl-2 border-l border-[#D0C9E8] dark:border-[#2A2438] transition-colors duration-300">
+        <div className="flex items-center gap-2 pl-2 border-l border-[#D0C9E8] dark:border-[#2A2438] transition-colors duration-300 shrink-0 pb-0.5">
           <button
             onClick={handleImageClick}
             disabled={disabled}
