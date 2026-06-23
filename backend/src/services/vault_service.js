@@ -38,7 +38,7 @@ async function getPublicKey() {
 
 async function signWithVault(payload, retry = true) {
   // Si c'est un retry, on force la génération d'un nouveau token
-  const token = await getToken(!retry); 
+const token = await getToken(retry === false);
 
   const header = Buffer.from(JSON.stringify({ alg: "ES256", typ: "JWT" })).toString("base64url");
   const body = Buffer.from(JSON.stringify(payload)).toString("base64url");
