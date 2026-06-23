@@ -6,11 +6,11 @@ export default function Logo() {
     <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
       
       <Image 
-        src="/breezy_logo.png"
+        src="/Breezy_logo.png"
         alt="Logo Breezy" 
-        width={40} 
-        height={40} 
-        className="w-10 h-10 object-contain"
+        width={80} 
+        height={80} 
+        className="w-20 h-20 object-contain"
       />
     </Link>
   );
