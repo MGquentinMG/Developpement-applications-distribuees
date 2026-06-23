@@ -70,24 +70,6 @@ export default function FeedPage() {
     return result;
   }, [activeTheme, searchQuery, posts]);
 
-  const handleLike = async (id: string) => {
-    try {
-      await api.post(`/api/posts/${id}/like`, {});
-      setPosts((prev) =>
-        prev.map((p) => {
-          if (p._id !== id) return p;
-          const alreadyLiked = user ? p.likes.includes(user._id) : false;
-          return {
-            ...p,
-            likes: alreadyLiked
-              ? p.likes.filter((uid) => uid !== user?._id)
-              : [...p.likes, user?._id ?? ""],
-          };
-        })
-      );
-    } catch {}
-  };
-
   return (
     <main className="min-h-screen bg-[#F9F9FB] dark:bg-[#121212] pb-32 transition-colors duration-300">
       <div className="flex items-center gap-3 px-4 pt-4 pb-3 sticky top-0 bg-[#F9F9FB] dark:bg-[#121212] z-40 transition-colors duration-300">
@@ -140,13 +122,13 @@ export default function FeedPage() {
               author={post.author?.username ?? "Anonyme"}
               timeAgo={timeAgo(post.createdAt)}
               content={post.content}
-              likes={formatCount(post.likes.length)}
+              
+              likes={post.likes.length} 
+              
               comments={formatCount(post.comments.length)}
               shares="0"
               avatarUrl={post.author?.avatar}
               imageUrl={post.image}
-              isLiked={user ? post.likes.includes(user._id) : false}
-              onLike={user ? () => handleLike(post._id) : undefined}
               onRequireAuth={!user ? () => router.push("/login") : undefined}
             />
           ))}

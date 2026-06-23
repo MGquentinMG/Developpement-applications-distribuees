@@ -29,7 +29,6 @@ describe("MessageListCard", () => {
   it("doit afficher le point rouge de notification si le message n'est pas lu", () => {
     const { container } = render(<MessageListCard {...defaultProps} isUnread={true} />);
     
-    // On cible l'indicateur via sa couleur rouge spécifique définie dans Tailwind
     const unreadIndicator = container.querySelector(".bg-\\[\\#FF0000\\]");
     expect(unreadIndicator).toBeInTheDocument();
   });

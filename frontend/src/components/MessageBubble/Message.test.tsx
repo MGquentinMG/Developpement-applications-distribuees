@@ -30,24 +30,19 @@ describe("MessageBubble", () => {
       />
     );
     
-    // L'image de base doit être présente
     const img = screen.getByAltText("Shared visual");
     expect(img).toBeInTheDocument();
     expect(img).toHaveAttribute("src", "/test-image.jpg");
 
-    // L'image en plein écran ne doit pas être là au début
     expect(screen.queryByAltText("Full screen visual")).not.toBeInTheDocument();
 
-    // 1. Clic pour ouvrir l'image
     fireEvent.click(img);
     const fullScreenImg = screen.getByAltText("Full screen visual");
     expect(fullScreenImg).toBeInTheDocument();
 
-    // 2. Clic sur le bouton de fermeture
     const closeBtn = screen.getByRole("button");
     fireEvent.click(closeBtn);
     
-    // L'image en plein écran doit avoir disparu
     expect(screen.queryByAltText("Full screen visual")).not.toBeInTheDocument();
   });
 });

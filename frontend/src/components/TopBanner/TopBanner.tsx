@@ -28,14 +28,14 @@ export default function TopBanner({ onLoginClick }: TopBannerProps) {
           </p>
         </div>
 
-        <div className="flex flex-col items-end">
+        <div className="flex flex-col items-end gap-12 mt-1">
           <Button
             label={t("topBanner.login")}
             isHashtag={false}
             variant="action"
             onClick={onLoginClick ?? (() => router.push("/login"))}
           />
-          <div className="w-28 h-28 mr-1 mt-3">
+          <div className="flex justify-end mr-2 transform scale-[2] origin-right drop-shadow-sm hover:scale-[1.8] transition-transform duration-300">
             <Logo />
           </div>
         </div>
