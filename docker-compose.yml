@@ -37,7 +37,7 @@ services:
     depends_on:
       vault:
         condition: service_healthy
-    entrypoint: ["sh", "/vault/init.sh"]
+    entrypoint: ["/bin/sh", "-c", "tr -d '\\r' < /vault/init.sh > /tmp/init.sh && sh /tmp/init.sh"]
 
   mongo-secure:
     image: mongo:7
