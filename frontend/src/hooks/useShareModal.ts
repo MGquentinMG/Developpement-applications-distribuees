@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { api } from "../services/api";
 
 export function useShareModal(isOpen: boolean, onClose: () => void, url: string) {
   const [copied, setCopied] = useState(false);
   const [sentTo, setSentTo] = useState<string[]>([]);
+  const [sending, setSending] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -10,7 +12,6 @@ export function useShareModal(isOpen: boolean, onClose: () => void, url: string)
     } else {
       document.body.style.overflow = "unset";
     }
-    
     return () => {
       document.body.style.overflow = "unset";
     };
@@ -27,17 +28,22 @@ export function useShareModal(isOpen: boolean, onClose: () => void, url: string)
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleSendToContact = (id: string) => {
-    if (!sentTo.includes(id)) {
-      setSentTo((prev) => [...prev, id]);
-    }
+  const handleSendToContact = async (recipientId: string) => {
+    if (sentTo.includes(recipientId) || sending === recipientId) return;
+    setSending(recipientId);
+    try {
+      await api.post("/api/messages", { recipientId, content: url });
+      setSentTo((prev) => [...prev, recipientId]);
+    } catch {}
+    setSending(null);
   };
 
   return {
     copied,
     sentTo,
+    sending,
     handleClose,
     handleCopy,
-    handleSendToContact
+    handleSendToContact,
   };
 }

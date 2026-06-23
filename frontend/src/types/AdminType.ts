@@ -3,12 +3,15 @@ export interface User {
   pseudo: string;
   email: string;
   createdAt: string;
+  banned?: boolean;
+  avatar?: string;
 }
 
 export interface Post {
   id: string;
   content: string;
   createdAt: string;
+  image?: string;
 }
 
 export interface AdminUserListProps {
@@ -24,4 +27,6 @@ export interface AdminUserDetailsProps {
   posts: Post[];
   onDeleteUser: (userId: string) => void;
   onDeletePost: (postId: string) => void;
+  onBanUser: (userId: string) => void;
+  onUnbanUser: (userId: string) => void;
 }

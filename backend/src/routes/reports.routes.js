@@ -28,7 +28,11 @@ module.exports = async function (fastify, opts) {
       if (req.user.role !== "admin") return errorResponse(reply, "Non autorisé", 403);
 
       const reports = await Report.find()
-        .populate("reportedPost", "content")
+        .populate({
+          path: "reportedPost",
+          select: "content image author",
+          populate: { path: "author", select: "username _id" },
+        })
         .populate("reportedUser", "username email")
         .populate("reporter", "username")
         .sort({ createdAt: -1 });

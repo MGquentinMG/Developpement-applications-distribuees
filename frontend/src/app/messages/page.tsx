@@ -1,29 +1,39 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 import "../../i18n";
 import Logo from "../../components/Logo/Logo";
 import SearchBar from "../../components/Searchbar/Searchbar";
 import { useAuth } from "../../contexts/AuthContext";
+import { api } from "../../services/api";
+
+interface ApiUser {
+  _id: string;
+  username: string;
+  avatar?: string;
+}
 
 export default function MessagesPage() {
   const { t } = useTranslation();
   const router = useRouter();
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
+  const [users, setUsers] = useState<ApiUser[]>([]);
 
-  const contacts = useMemo(() => {
-    if (!user) return [];
-    return user.following;
+  useEffect(() => {
+    if (!user) return;
+    api.get<ApiUser[]>("/api/messages/conversations").then((data) => {
+      setUsers(Array.isArray(data) ? data : []);
+    }).catch(() => {});
   }, [user]);
 
-  const filteredContacts = useMemo(() => {
-    if (!searchQuery.trim()) return contacts;
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery.trim()) return users;
     const q = searchQuery.toLowerCase();
-    return contacts.filter((c) => c.username.toLowerCase().includes(q));
-  }, [contacts, searchQuery]);
+    return users.filter((u) => u.username.toLowerCase().includes(q));
+  }, [users, searchQuery]);
 
   if (!user) {
     return (
@@ -54,16 +64,16 @@ export default function MessagesPage() {
           {t("messages.title")}
         </h2>
 
-        {filteredContacts.length === 0 && (
+        {filteredUsers.length === 0 && (
           <p className="text-gray-400 dark:text-gray-500 text-sm text-center mt-10">
             {searchQuery
               ? t("messages.noResults", "Aucun résultat.")
-              : t("messages.noContacts", "Abonne-toi à des personnes pour démarrer une conversation.")}
+              : t("messages.noContacts", "Aucun utilisateur trouvé.")}
           </p>
         )}
 
         <div className="flex flex-col divide-y divide-gray-100 dark:divide-gray-800">
-          {filteredContacts.map((contact) => {
+          {filteredUsers.map((contact) => {
             const avatar =
               contact.avatar ||
               `https://api.dicebear.com/7.x/avataaars/svg?seed=${contact.username}`;
