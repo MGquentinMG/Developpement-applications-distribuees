@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { InputField } from "./InputField";
 import { ErrorMessage } from "./ErrorMessage";
 import { AuthFormProps } from "../../types/AuthType";
-import { useAuthLogic } from "../../hooks/useAuthLogic";
+import { useAuth } from "../../contexts/AuthContext";
 import "../../i18n";
 
 const GoogleIcon = () => (
@@ -25,7 +25,9 @@ const UserIcon = () => (
 
 export function RegisterForm({ onSwitchMode, onClose }: AuthFormProps) {
   const { t } = useTranslation();
-  const { register, isLoading, error } = useAuthLogic();
+  const { register } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [step, setStep] = useState<1 | 2>(1);
   const [pseudo, setPseudo] = useState("");
@@ -57,15 +59,17 @@ export function RegisterForm({ onSwitchMode, onClose }: AuthFormProps) {
     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
       calculatedAge--;
     }
-    
-    const success = await register({ 
-      username: pseudo, 
-      email, 
-      password, 
-      age: calculatedAge
-    });
-    
-    if (success) onClose();
+
+    setIsLoading(true);
+    setError(null);
+    try {
+      await register({ username: pseudo, email, password, age: calculatedAge });
+      onClose();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Erreur lors de l'inscription");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];

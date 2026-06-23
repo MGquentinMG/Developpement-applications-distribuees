@@ -19,8 +19,10 @@ export default function PostCard({
   shares,
   avatarUrl,
   imageUrl,
+  isLiked: isLikedProp,
   onRequireAuth,
-  onCommentClick
+  onCommentClick,
+  onLike,
 }: PostCardProps) {
   const {
     isLiked,
@@ -31,7 +33,7 @@ export default function PostCard({
     handleLike,
     handleCommentClick,
     handleShareClick
-  } = usePostCard(id, onRequireAuth, onCommentClick);
+  } = usePostCard(id, onRequireAuth, onCommentClick, onLike, isLikedProp);
 
   const displayAuthor = truncateAuthor(author);
 

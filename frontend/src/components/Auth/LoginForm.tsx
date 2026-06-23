@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { InputField } from "./InputField";
 import { ErrorMessage } from "./ErrorMessage";
 import { AuthFormProps } from "../../types/AuthType";
-import { useAuthLogic } from "../../hooks/useAuthLogic";
+import { useAuth } from "../../contexts/AuthContext";
 import "../../i18n";
 
 const GoogleIcon = () => (
@@ -25,16 +25,26 @@ const UserIcon = () => (
 
 export function LoginForm({ onSwitchMode, onClose }: AuthFormProps) {
   const { t } = useTranslation();
-  const { login, isLoading, error } = useAuthLogic();
-  
+  const { login } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const [step, setStep] = useState<1 | 2>(1);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await login({ email, password });
-    if (success) onClose();
+    setIsLoading(true);
+    setError(null);
+    try {
+      await login(email, password);
+      onClose();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Identifiants invalides");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
