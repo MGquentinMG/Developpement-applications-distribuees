@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost";
 
 console.log("[API] Base URL:", API_URL);
 
@@ -96,7 +96,7 @@ export interface ApiResponse<T = unknown> {
   data?: T;
 }
 
-const API_BASE_URL = "http://localhost:3001/api";
+const API_BASE_URL = "http://localhost";
 
 export async function handleApiCall<T>(
   endpoint: string, 
