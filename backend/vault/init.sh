@@ -1,79 +1,46 @@
 #!/bin/sh
-set -e
 
-echo "==> Checking Vault status..."
+export VAULT_ADDR="${VAULT_ADDR:-http://vault:8200}"
+export VAULT_TOKEN="${VAULT_TOKEN:-breezy_dev_root}"
 
-IS_INITIALIZED=$(vault status -format=json 2>/dev/null | grep '"initialized"' | grep 'true' || true)
+echo "==> VAULT_ADDR=$VAULT_ADDR"
+echo "==> Attente de Vault (max 60s)..."
+i=1
+while [ $i -le 30 ]; do
+  vault status 2>/dev/null && break
+  echo "  [${i}/30] pas encore pret, retry dans 2s..."
+  sleep 2
+  i=$((i + 1))
+done
 
-if [ -z "$IS_INITIALIZED" ]; then
-  echo "==> Vault not initialized. Running init..."
+vault status || { echo "==> ERREUR: Vault inaccessible apres 60s"; exit 1; }
 
-  INIT_OUTPUT=$(vault operator init -key-shares=1 -key-threshold=1 -format=json)
-  echo "$INIT_OUTPUT" > /vault/init_output.json
+echo "==> Activation approle..."
+vault auth enable approle 2>&1 || echo "  (deja actif)"
 
-  # Vault 1.17 sort du JSON multi-ligne → on utilise sed pour parser ligne par ligne
-  UNSEAL_KEY=$(echo "$INIT_OUTPUT" | sed -n '/"unseal_keys_b64"/{n;p}' | tr -d ' [],"')
-  ROOT_TOKEN=$(echo "$INIT_OUTPUT" | grep '"root_token"' | sed 's/.*"root_token": *"\([^"]*\)".*/\1/')
+echo "==> Activation transit..."
+vault secrets enable transit 2>&1 || echo "  (deja actif)"
 
-  if [ -z "$UNSEAL_KEY" ] || [ -z "$ROOT_TOKEN" ]; then
-    echo "==> ERROR: impossible d'extraire UNSEAL_KEY ou ROOT_TOKEN du JSON." >&2
-    echo "==> Contenu du JSON:" >&2
-    cat /vault/init_output.json >&2
-    exit 1
-  fi
+echo "==> Activation kv-v2..."
+vault secrets enable -path=secret kv-v2 2>&1 || echo "  (deja actif)"
 
-  echo "==> Unsealing..."
-  vault operator unseal "$UNSEAL_KEY"
-  export VAULT_TOKEN="$ROOT_TOKEN"
+echo "==> Creation de la cle transit JWT..."
+vault write -f transit/keys/jwt-key type=ecdsa-p256 2>&1 || echo "  (deja existant)"
 
-  # Sauvegarder les credentials pour les redémarrages
-  printf 'UNSEAL_KEY=%s\nROOT_TOKEN=%s\n' "$UNSEAL_KEY" "$ROOT_TOKEN" > /vault/keys.env
+echo "==> Ecriture de la policy..."
+printf 'path "transit/sign/jwt-key"   { capabilities = ["create","update"] }\npath "transit/verify/jwt-key" { capabilities = ["create","update"] }\npath "transit/keys/jwt-key"   { capabilities = ["read"] }\npath "secret/data/breezy/*"   { capabilities = ["read"] }\n' > /tmp/policy.hcl
+vault policy write breezy-policy /tmp/policy.hcl
 
-  echo "==> Enabling secrets engines and auth..."
-  vault auth enable approle
-  vault secrets enable transit
-  vault secrets enable -path=secret kv-v2
+echo "==> Creation du role AppRole..."
+vault write auth/approle/role/breezy-app \
+  token_policies="breezy-policy" \
+  token_ttl=1h \
+  token_max_ttl=4h
 
-  vault write -f transit/keys/jwt-key type=ecdsa-p256
+echo "==> Recuperation des credentials..."
+ROLE_ID=$(vault read -field=role_id auth/approle/role/breezy-app/role-id)
+SECRET_ID=$(vault write -f -field=secret_id auth/approle/role/breezy-app/secret-id)
 
-  vault policy write breezy-policy - <<EOF
-path "transit/sign/jwt-key"   { capabilities = ["create","update"] }
-path "transit/verify/jwt-key" { capabilities = ["create","update"] }
-path "transit/keys/jwt-key"   { capabilities = ["read"] }
-path "secret/data/breezy/*"   { capabilities = ["read"] }
-EOF
+printf 'APP_VAULT_ROLE_ID=%s\nAPP_VAULT_SECRET_ID=%s\n' "$ROLE_ID" "$SECRET_ID" > /vault/keys.env
 
-  vault write auth/approle/role/breezy-app \
-    token_policies="breezy-policy" \
-    token_ttl=1h \
-    token_max_ttl=4h
-
-  ROLE_ID=$(vault read -field=role_id auth/approle/role/breezy-app/role-id)
-  SECRET_ID=$(vault write -f -field=secret_id auth/approle/role/breezy-app/secret-id)
-
-  printf 'APP_VAULT_ROLE_ID=%s\nAPP_VAULT_SECRET_ID=%s\n' "$ROLE_ID" "$SECRET_ID" >> /vault/keys.env
-
-  echo "==> Init termine. Credentials dans /vault/keys.env"
-
-else
-  echo "==> Vault already initialized. Unsealing if needed..."
-
-  IS_SEALED=$(vault status -format=json 2>/dev/null | grep '"sealed"' | grep 'true' || true)
-
-  if [ -n "$IS_SEALED" ]; then
-    if [ -f /vault/keys.env ]; then
-      UNSEAL_KEY=$(grep "^UNSEAL_KEY=" /vault/keys.env | cut -d'=' -f2 | tr -d '\r\n')
-      if [ -z "$UNSEAL_KEY" ]; then
-        echo "==> ERROR: UNSEAL_KEY vide dans keys.env." >&2
-        exit 1
-      fi
-      vault operator unseal "$UNSEAL_KEY"
-      echo "==> Vault unsealed."
-    else
-      echo "==> ERROR: keys.env introuvable." >&2
-      exit 1
-    fi
-  else
-    echo "==> Vault already unsealed."
-  fi
-fi
+echo "==> Done. ROLE_ID=$ROLE_ID"
