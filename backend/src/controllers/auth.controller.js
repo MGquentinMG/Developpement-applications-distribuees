@@ -39,11 +39,10 @@ exports.login = async (req, reply) => {
       return errorResponse(reply, "Email ou mot de passe incorrect", 401);
     }
 
-
-    const token = req.server.jwt.sign({ 
-      id: user._id.toString(), 
-      role: user.role 
-    });
+    const token = await req.server.signJWT({
+    id: user._id.toString(),
+    role: user.role
+  });
 
     return successResponse(reply, { 
       token,

@@ -6,22 +6,10 @@ const app = Fastify({ logger: true });
 app.register(require("@fastify/cors"));
 app.register(require("@fastify/helmet"));
 
-// 2. Configuration JWT
-app.register(require("@fastify/jwt"), {
-  secret: process.env.JWT_SECRET
-});
+// 2. JWT via Vault
+app.register(require("./plugins/jwt_plugin"));
 
-// 3. Middlewares
-app.decorate("authenticate", async (request, reply) => {
-  try {
-    await request.jwtVerify();
-  } catch (err) {
-    return reply.status(401).send({
-      success: false,
-      message: "Non autorisé : Token invalide ou absent"
-    });
-  }
-});
+// 3. Authenticate est décoré dans jwt_plugin, supprimer le doublon ici
 
 // 4. Routes
 app.register(require("./routes/auth.routes"), { prefix: "/api/auth" });
@@ -31,7 +19,7 @@ app.register(require("./routes/comments.routes"), { prefix: "/api/comments" });
 app.register(require("./routes/messages.routes"), { prefix: "/api/messages" });
 app.register(require("./routes/notifications.routes"), { prefix: "/api/notifications" });
 app.register(require("./routes/moderation.routes"), { prefix: "/api/moderation" });
-app.register(require("./routes/reports.routes"), { prefix: "/api/reports" }); // ⭐ AJOUTER
+app.register(require("./routes/reports.routes"), { prefix: "/api/reports" });
 
 // 5. Gestionnaire d'erreurs
 app.setErrorHandler((error, request, reply) => {
