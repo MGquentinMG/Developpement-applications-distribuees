@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Post = require("../models/Post");
+const Notification = require("../models/Notification");
 const successResponse = require("../utils/successResponse");
 const errorResponse = require("../utils/errorResponse");
 
@@ -88,10 +89,15 @@ module.exports = async function (fastify, opts) {
         userToFollow.followers.push(req.user.id);
         await userToFollow.save();
 
-
         const currentUser = await User.findById(req.user.id);
         currentUser.following.push(req.params.id);
         await currentUser.save();
+
+        await Notification.create({
+          user: req.params.id,
+          type: "follow",
+          relatedUser: req.user.id,
+        });
 
         return successResponse(reply, null, "Utilisateur suivi");
       } catch (err) {

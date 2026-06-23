@@ -9,9 +9,9 @@ import { Heart, MessageCircle } from "lucide-react";
 import { CommentProps } from "../../types/CommentType";
 import "../../i18n";
 
-export default function CommentCard({ id, author, timeAgo, content, likes, avatarUrl, onReply }: CommentProps) {
+export default function CommentCard({ id, author, timeAgo, content, likes, avatarUrl, imageUrl, isLiked: isLikedProp, onLike, onReply }: CommentProps) {
   const { t } = useTranslation();
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState(isLikedProp ?? false);
 
   return (
     <div className="flex gap-3 mb-5">
@@ -25,11 +25,18 @@ export default function CommentCard({ id, author, timeAgo, content, likes, avata
           </Link>
           <span className="text-[10px] text-gray-500 dark:text-[#A395DA]">{timeAgo}</span>
         </div>
-        <p className="text-[#492775] dark:text-[#D0C9E8] text-[13px] leading-snug mb-3">
-          {content}
-        </p>
+        {content && (
+          <p className="text-[#492775] dark:text-[#D0C9E8] text-[13px] leading-snug mb-3">
+            {content}
+          </p>
+        )}
+        {imageUrl && (
+          <div className="rounded-xl overflow-hidden mb-3">
+            <img src={imageUrl} alt="image du commentaire" className="w-full max-h-48 object-cover" />
+          </div>
+        )}
         <div className="flex items-center gap-4">
-          <PostAction icon={Heart} count={likes} filled={isLiked} onClick={() => setIsLiked(!isLiked)} />
+          <PostAction icon={Heart} count={likes} filled={isLiked} onClick={() => { setIsLiked(!isLiked); onLike?.(); }} />
           <button 
             onClick={() => onReply && onReply(author)}
             className="flex items-center gap-1 group cursor-pointer text-[#A395DA] dark:text-[#8B7BB5] hover:text-[#492775] dark:hover:text-[#D0C9E8] transition-colors duration-300"

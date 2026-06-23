@@ -12,6 +12,7 @@ import { useAuth } from "../../../contexts/AuthContext";
 interface ApiComment {
   _id: string;
   content: string;
+  imageUrl?: string;
   author: { _id: string; username: string; avatar?: string } | string;
   createdAt: string;
   likes?: string[];
@@ -36,6 +37,8 @@ export default function PostDetailsPage() {
 
   const [post, setPost] = useState<ApiPost | null>(null);
   const [commentText, setCommentText] = useState("");
+  const [commentImageFile, setCommentImageFile] = useState<File | null>(null);
+  const [commentImagePreview, setCommentImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
 
@@ -49,20 +52,65 @@ export default function PostDetailsPage() {
   }, [postId]);
 
   const handleSendComment = async () => {
-    if (!commentText.trim() || !user || sending) return;
+    if (!commentText.trim() && !commentImageFile) return;
+    if (!user || sending) return;
     setSending(true);
     try {
+      let imageUrl: string | undefined;
+      if (commentImageFile) {
+        imageUrl = await api.uploadImage(commentImageFile);
+      }
       const newComment = await api.post<ApiComment>(`/api/comments/${postId}`, {
         content: commentText.trim(),
+        ...(imageUrl ? { imageUrl } : {}),
       });
+      const commentWithAuthor: ApiComment = {
+        ...newComment,
+        author: { _id: user._id, username: user.username, avatar: user.avatar },
+      };
       setPost((prev) =>
-        prev ? { ...prev, comments: [...prev.comments, newComment] } : prev
+        prev ? { ...prev, comments: [...prev.comments, commentWithAuthor] } : prev
       );
       setCommentText("");
+      setCommentImageFile(null);
+      setCommentImagePreview(null);
     } catch {
     } finally {
       setSending(false);
     }
+  };
+
+  const handleCommentImageSelect = (file: File) => {
+    setCommentImageFile(file);
+    setCommentImagePreview(URL.createObjectURL(file));
+  };
+
+  const handleRemoveCommentImage = () => {
+    setCommentImageFile(null);
+    setCommentImagePreview(null);
+  };
+
+  const handleLikeComment = async (commentId: string) => {
+    if (!user) return;
+    try {
+      await api.post(`/api/comments/${commentId}/like`, {});
+      setPost((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          comments: prev.comments.map((c) => {
+            if (c._id !== commentId) return c;
+            const alreadyLiked = user ? c.likes?.includes(user._id) : false;
+            return {
+              ...c,
+              likes: alreadyLiked
+                ? (c.likes ?? []).filter((id) => id !== user._id)
+                : [...(c.likes ?? []), user._id],
+            };
+          }),
+        };
+      });
+    } catch {}
   };
 
   const handleReply = (author: string) => {
@@ -141,7 +189,10 @@ export default function PostDetailsPage() {
                 avatarUrl={getAuthorAvatar(comment.author)}
                 timeAgo={timeAgo(comment.createdAt)}
                 content={comment.content}
+                imageUrl={comment.imageUrl}
                 likes={formatCount(comment.likes?.length ?? 0)}
+                isLiked={user ? (comment.likes ?? []).includes(user._id) : false}
+                onLike={() => handleLikeComment(comment._id)}
                 onReply={handleReply}
               />
             ))}
@@ -150,10 +201,12 @@ export default function PostDetailsPage() {
       )}
 
       <MessageInput
-        inputRef={inputRef}
         value={commentText}
         onChange={setCommentText}
         onSend={handleSendComment}
+        onImageSelect={handleCommentImageSelect}
+        imagePreview={commentImagePreview}
+        onRemoveImage={handleRemoveCommentImage}
         placeholder={user ? "Ajouter un commentaire..." : "Connecte-toi pour commenter"}
         disabled={!user || sending}
       />

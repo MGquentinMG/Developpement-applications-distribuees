@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
-export function usePostCard(id: string | number, onRequireAuth?: () => void, onCommentClick?: () => void) {
+export function usePostCard(id: string | number, onRequireAuth?: () => void, onCommentClick?: () => void, onLike?: () => void, isLikedInitial = false) {
   const router = useRouter();
   const pathname = usePathname();
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState(isLikedInitial);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const postUrl = typeof window !== "undefined" ? `${window.location.origin}/post/${id}` : "";
@@ -21,14 +21,15 @@ export function usePostCard(id: string | number, onRequireAuth?: () => void, onC
 
   const handleLike = (e: React.MouseEvent) => {
     e.preventDefault();
-    e.stopPropagation();    
-    
+    e.stopPropagation();
+
     if (onRequireAuth) {
       onRequireAuth();
       return;
     }
-    
+
     setIsLiked(!isLiked);
+    onLike?.();
   };
 
   const handleCommentClick = (e: React.MouseEvent) => {

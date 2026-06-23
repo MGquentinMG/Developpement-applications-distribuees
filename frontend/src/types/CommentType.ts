@@ -5,5 +5,8 @@ export interface CommentProps {
   timeAgo: string;
   content: string;
   likes: string | number;
+  imageUrl?: string;
+  isLiked?: boolean;
+  onLike?: () => void;
   onReply?: (author: string) => void;
 }

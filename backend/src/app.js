@@ -4,7 +4,12 @@ const Fastify = require("fastify");
 const app = Fastify({ logger: true });
 
 // 1. Plugins de base
-app.register(require("@fastify/cors"));
+app.register(require("@fastify/cors"), {
+  origin: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+});
 app.register(require("@fastify/helmet"), { crossOriginResourcePolicy: false });
 app.register(require("@fastify/multipart"), { limits: { fileSize: 5 * 1024 * 1024 } });
 app.register(require("@fastify/static"), {

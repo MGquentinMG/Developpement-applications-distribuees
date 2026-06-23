@@ -145,6 +145,7 @@ export default function FeedPage() {
               shares="0"
               avatarUrl={post.author?.avatar}
               imageUrl={post.image}
+              isLiked={user ? post.likes.includes(user._id) : false}
               onLike={user ? () => handleLike(post._id) : undefined}
               onRequireAuth={!user ? () => router.push("/login") : undefined}
             />

@@ -16,6 +16,7 @@ export default function CreatePostPage() {
 
   const [content, setContent] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [error, setError] = useState("");
@@ -27,13 +28,18 @@ export default function CreatePostPage() {
   };
 
   const handlePublish = async () => {
-    if (!content.trim() && !imagePreview) return;
+    if (!content.trim() && !imageFile) return;
     setPublishing(true);
     setError("");
     try {
+      let imageUrl: string | undefined;
+      if (imageFile) {
+        imageUrl = await api.uploadImage(imageFile);
+      }
       await api.post("/api/posts", {
         content,
         tags: extractTags(content),
+        ...(imageUrl ? { image: imageUrl } : {}),
       });
       router.back();
     } catch (err: unknown) {
@@ -54,11 +60,15 @@ export default function CreatePostPage() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) setImagePreview(URL.createObjectURL(file));
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
   };
 
   const removeImage = () => {
     setImagePreview(null);
+    setImageFile(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -83,9 +93,9 @@ export default function CreatePostPage() {
 
         <button
           onClick={handlePublish}
-          disabled={(!content.trim() && !imagePreview) || publishing}
+          disabled={(!content.trim() && !imageFile) || publishing}
           className={`px-5 py-1.5 rounded-full font-bold text-[13px] transition-all duration-200 ${
-            (content.trim() || imagePreview) && !publishing
+            (content.trim() || imageFile) && !publishing
               ? "bg-[#492775] text-white shadow-md hover:bg-[#3a1f5d] cursor-pointer"
               : "bg-[#F3F4F6] text-gray-400 cursor-not-allowed"
           }`}
