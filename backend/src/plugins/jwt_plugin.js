@@ -1,22 +1,29 @@
 const fp = require("fastify-plugin");
+const fastifyJwt = require("@fastify/jwt");
+const { getPublicKey, signWithVault } = require("../services/vault_service");
 
-async function jwtPlugin(fastify) {
-  fastify.register(require("@fastify/jwt"), {
-    secret: process.env.JWT_SECRET || "fallback_secret_dev",
-    sign: { expiresIn: "7d" },
+module.exports = fp(async function (app) {
+  const publicKey = await getPublicKey();
+
+  app.register(fastifyJwt, {
+    secret: {
+      private: null,   // on ne signe pas via @fastify/jwt
+      public: publicKey
+    },
+    sign: { algorithm: "ES256" }
   });
 
-  fastify.decorate("signJWT", async function (payload) {
-    return fastify.jwt.sign(payload);
+  // Override du sign pour passer par Vault
+  app.decorate("signJWT", async function (payload) {
+    return signWithVault(payload);
   });
 
-  fastify.decorate("authenticate", async function (req, reply) {
+  app.decorate("authenticate", async function (request, reply) {
     try {
-      await req.jwtVerify();
+      await request.jwtVerify();
     } catch (err) {
-      reply.status(401).send({ success: false, message: "Non authentifié" });
+      request.log.error(err, "Échec de la validation JWT");
+      reply.status(401).send({ error: "Unauthorized" });
     }
   });
-}
-
-module.exports = fp(jwtPlugin);
+});
