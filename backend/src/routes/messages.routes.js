@@ -6,11 +6,13 @@ module.exports = async function (fastify, opts) {
   // Envoyer un message
   fastify.post("/", { onRequest: [fastify.authenticate] }, async (req, reply) => {
     try {
-      const { recipientId, content } = req.body;
+      const { recipientId, content, imageUrl } = req.body;
+      if (!content && !imageUrl) return errorResponse(reply, "Contenu ou image requis", 400);
       const message = await Message.create({
         sender: req.user.id,
         recipient: recipientId,
-        content
+        content: content || "",
+        imageUrl,
       });
       return successResponse(reply, message, "Message envoyé", 201);
     } catch (err) {

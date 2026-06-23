@@ -39,10 +39,8 @@ describe("MessageInput", () => {
     
     const fileInput = screen.getByTestId("file-input");
     
-    // On simule la création d'un faux fichier image
     const file = new File(["dummy content"], "photo.png", { type: "image/png" });
     
-    // On simule l'upload de ce fichier
     fireEvent.change(fileInput, { target: { files: [file] } });
     
     expect(handleImageSelect).toHaveBeenCalledWith(file);

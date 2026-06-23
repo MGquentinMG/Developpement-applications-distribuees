@@ -3,21 +3,32 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { navLinks } from "../../utils/NavigationUtil";
+import { useAuth } from "../../contexts/AuthContext";
+import { Shield } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { user } = useAuth();
 
   const isIndividualMessage = pathname.startsWith("/messages/") && pathname !== "/messages";
+  const isPostPage = pathname.startsWith("/post/");
   const hiddenRoutes = ["/", "/login", "/register", "/create-post", "/legal"];
 
-  if (hiddenRoutes.includes(pathname) || isIndividualMessage) {
+  if (hiddenRoutes.includes(pathname) || isIndividualMessage || isPostPage) {
     return null;
   }
 
-  const half = Math.floor(navLinks.length / 2);
-  const leftLinks = navLinks.slice(0, half);
-  const rightLinks = navLinks.slice(half);
+  const dynamicLinks = [...navLinks];
+  
+  // LOGIQUE RESTAURÉE : Vérifie le vrai rôle de l'utilisateur
+  if (user?.role === "admin" && !dynamicLinks.some(link => link.href === "/admin")) {
+    dynamicLinks.push({ name: "Admin", href: "/admin", icon: Shield });
+  }
+
+  const half = Math.floor(dynamicLinks.length / 2);
+  const leftLinks = dynamicLinks.slice(0, half);
+  const rightLinks = dynamicLinks.slice(half);
 
   return (
     <nav className="fixed bottom-6 left-4 right-4 max-w-md mx-auto bg-[#C8BFE9] dark:bg-[#2A2438] rounded-3xl sm:hidden z-50 shadow-lg transition-colors duration-300">
@@ -42,7 +53,7 @@ export default function Navbar() {
 
         <button
           onClick={() => router.push("/create-post")}
-          className="flex items-center justify-center w-14 h-14 bg-[#492775] dark:bg-[#8B7BB5] rounded-2xl shadow-[0_4px_20px_rgba(73,39,117,0.35)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.5)] hover:bg-[#3a1f5d] dark:hover:bg-[#6B5B8B] active:scale-95 transition-all duration-300"
+          className="flex items-center justify-center w-14 h-14 bg-[#492775] dark:bg-[#8B7BB5] rounded-2xl shadow-[0_4px_20px_rgba(73,39,117,0.35)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.5)] hover:bg-[#3a1f5d] dark:hover:bg-[#6B5B8B] active:scale-95 transition-all duration-300 shrink-0"
           aria-label="Créer un post"
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

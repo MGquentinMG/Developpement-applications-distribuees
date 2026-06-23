@@ -1,5 +1,6 @@
 const Post = require("../models/Post");
 const User = require("../models/User");
+const Notification = require("../models/Notification");
 const successResponse = require("../utils/successResponse");
 const errorResponse = require("../utils/errorResponse");
 
@@ -74,8 +75,11 @@ module.exports = async function (fastify, opts) {
   fastify.get("/:id", async (req, reply) => {
     try {
       const post = await Post.findById(req.params.id)
-        .populate("author")
-        .populate("comments");
+        .populate("author", "username avatar")
+        .populate({
+          path: "comments",
+          populate: { path: "author", select: "username avatar" },
+        });
       if (!post) return errorResponse(reply, "Post non trouvé", 404);
       return successResponse(reply, post);
     } catch (err) {
@@ -107,8 +111,16 @@ module.exports = async function (fastify, opts) {
         post.likes = post.likes.filter(id => id.toString() !== req.user.id);
       } else {
         post.likes.push(req.user.id);
+        if (post.author.toString() !== req.user.id) {
+          await Notification.create({
+            user: post.author,
+            type: "like",
+            relatedUser: req.user.id,
+            relatedPost: post._id,
+          });
+        }
       }
-      
+
       await post.save();
       return successResponse(reply, post);
     } catch (err) {

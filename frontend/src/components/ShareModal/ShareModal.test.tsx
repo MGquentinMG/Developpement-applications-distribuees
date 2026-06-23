@@ -1,6 +1,13 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
 import ShareModal from "./ShareModal";
+import { useAuth } from "../../contexts/AuthContext";
+
+vi.mock("../../contexts/AuthContext", () => ({
+  useAuth: vi.fn(),
+}));
+
+vi.mock("../../i18n", () => ({}));
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
@@ -27,6 +34,14 @@ describe("ShareModal", () => {
   };
 
   beforeEach(() => {
+    vi.clearAllMocks();
+    (useAuth as Mock).mockReturnValue({
+      user: {
+        following: [
+          { _id: "user1", username: "Contact 1", avatar: "" }
+        ]
+      }
+    });
     Object.assign(navigator, {
       clipboard: {
         writeText: vi.fn(),

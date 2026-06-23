@@ -4,7 +4,11 @@ const CommentSchema = new mongoose.Schema(
   {
     content: {
       type: String,
-      required: true
+      default: "",
+    },
+
+    imageUrl: {
+      type: String,
     },
 
     author: {
@@ -32,7 +36,9 @@ const CommentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Comment",
       default: null
-    }
+    },
+
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
   },
   { timestamps: true }
 );

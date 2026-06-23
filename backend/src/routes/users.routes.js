@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Post = require("../models/Post");
+const Notification = require("../models/Notification");
 const successResponse = require("../utils/successResponse");
 const errorResponse = require("../utils/errorResponse");
 
@@ -22,6 +23,19 @@ module.exports = async function (fastify, opts) {
     }
   );
 
+
+  fastify.get("/by-username/:username", async (req, reply) => {
+    try {
+      const user = await User.findOne({ username: req.params.username })
+        .select("-password")
+        .populate("followers", "username avatar")
+        .populate("following", "username avatar");
+      if (!user) return errorResponse(reply, "User non trouvé", 404);
+      return successResponse(reply, user);
+    } catch (err) {
+      return errorResponse(reply, "Erreur", 500);
+    }
+  });
 
   fastify.get("/:id", async (req, reply) => {
     try {
@@ -75,10 +89,15 @@ module.exports = async function (fastify, opts) {
         userToFollow.followers.push(req.user.id);
         await userToFollow.save();
 
-
         const currentUser = await User.findById(req.user.id);
         currentUser.following.push(req.params.id);
         await currentUser.save();
+
+        await Notification.create({
+          user: req.params.id,
+          type: "follow",
+          relatedUser: req.user.id,
+        });
 
         return successResponse(reply, null, "Utilisateur suivi");
       } catch (err) {

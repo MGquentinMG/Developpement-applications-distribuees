@@ -10,10 +10,12 @@ import AccordionItem from "../../components/AccordionItem/AccordionItem";
 import BackButton from "../../components/BackButton/BackButton";
 import Toggle from "../../components/Toggle/Toggle";
 import { useTheme } from "../../contexts/ThemeContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function SettingsPage() {
   const { t, i18n } = useTranslation();
   const { theme, toggleTheme } = useTheme();
+  const { user } = useAuth();
   
   const [notifLikes, setNotifLikes] = useState(true);
   const [notifComments, setNotifComments] = useState(true);
@@ -32,10 +34,10 @@ export default function SettingsPage() {
 
       <div className="px-6 py-6 flex items-center gap-4 mb-2">
         <div className="w-16 h-16 shrink-0">
-          <Avatar />
+          <Avatar src={user?.avatar} alt={user?.username} />
         </div>
         <div className="flex flex-col">
-          <span className="text-[#1E1E40] dark:text-[#F9F9FB] text-[19px] font-bold">User name</span>
+          <span className="text-[#1E1E40] dark:text-[#F9F9FB] text-[19px] font-bold">@{user?.username ?? "..."}</span>
           <button className="flex items-center text-[#8B7BB5] dark:text-[#A395DA] text-sm mt-0.5 hover:underline">
             {t("settings.editProfile")} <ChevronRight size={16} className="ml-1" />
           </button>

@@ -2,10 +2,15 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, Mock } from "vitest";
 import Navbar from "./Navbar";
 import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "../../contexts/AuthContext";
 
 vi.mock("next/navigation", () => ({
   usePathname: vi.fn(),
   useRouter: vi.fn(),
+}));
+
+vi.mock("../../contexts/AuthContext", () => ({
+  useAuth: vi.fn(),
 }));
 
 vi.mock("../../utils/NavigationUtil", () => ({
@@ -21,6 +26,7 @@ describe("Navbar", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     (useRouter as Mock).mockReturnValue({ push: mockPush });
+    (useAuth as Mock).mockReturnValue({ user: { role: "user" } });
   });
 
   it("ne doit pas s'afficher sur la page d'accueil (/)", () => {
@@ -29,8 +35,8 @@ describe("Navbar", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("ne doit pas s'afficher sur la page /login", () => {
-    (usePathname as Mock).mockReturnValue("/login");
+  it("ne doit pas s'afficher sur la page d'un post détaillé", () => {
+    (usePathname as Mock).mockReturnValue("/post/12345");
     const { container } = render(<Navbar />);
     expect(container).toBeEmptyDOMElement();
   });
@@ -49,5 +55,15 @@ describe("Navbar", () => {
     fireEvent.click(createButton);
     
     expect(mockPush).toHaveBeenCalledWith("/create-post");
+  });
+
+  it("doit afficher l'icône Admin si l'utilisateur a le rôle admin", () => {
+    (usePathname as Mock).mockReturnValue("/feed");
+    (useAuth as Mock).mockReturnValue({ user: { role: "admin" } });
+    
+    const { container } = render(<Navbar />);
+    const adminLink = container.querySelector("a[href='/admin']");
+    
+    expect(adminLink).toBeInTheDocument();
   });
 });

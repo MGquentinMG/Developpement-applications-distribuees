@@ -19,11 +19,16 @@ export default function PostCard({
   shares,
   avatarUrl,
   imageUrl,
+  isLiked: isLikedProp,
   onRequireAuth,
-  onCommentClick
+  onCommentClick,
+  onLike,
 }: PostCardProps) {
+  const initialLikes = typeof likes === "number" ? likes : parseInt(likes as string, 10) || 0;
+
   const {
     isLiked,
+    likesCount, 
     isShareModalOpen,
     setIsShareModalOpen,
     postUrl,
@@ -31,7 +36,7 @@ export default function PostCard({
     handleLike,
     handleCommentClick,
     handleShareClick
-  } = usePostCard(id, onRequireAuth, onCommentClick);
+  } = usePostCard(id, initialLikes, onRequireAuth, onCommentClick);
 
   const displayAuthor = truncateAuthor(author);
 
@@ -55,7 +60,7 @@ export default function PostCard({
         </Link>
 
         <div className="absolute top-3 right-4 flex items-center gap-3">
-          <PostAction icon={Heart} count={likes} filled={isLiked} onClick={handleLike} />
+          <PostAction icon={Heart} count={likesCount} filled={isLiked} onClick={handleLike} />
           <PostAction icon={MessageCircle} count={comments} filled={false} onClick={handleCommentClick} />
           <PostAction icon={Upload} count={shares} filled={false} onClick={handleShareClick} />
         </div>
