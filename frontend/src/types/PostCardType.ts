@@ -8,6 +8,7 @@ export interface PostCardProps {
   shares: string | number;
   avatarUrl?: string;
   imageUrl?: string;
+  isLiked?: boolean;
   onRequireAuth?: () => void;
   onCommentClick?: () => void;
   onLike?: () => void;

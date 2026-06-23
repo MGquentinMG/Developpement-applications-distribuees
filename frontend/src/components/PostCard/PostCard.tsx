@@ -19,8 +19,10 @@ export default function PostCard({
   shares,
   avatarUrl,
   imageUrl,
+  isLiked: isLikedProp,
   onRequireAuth,
-  onCommentClick
+  onCommentClick,
+  onLike,
 }: PostCardProps) {
   const initialLikes = typeof likes === "number" ? likes : parseInt(likes as string, 10) || 0;
 

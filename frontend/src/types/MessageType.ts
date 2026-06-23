@@ -21,7 +21,10 @@ export interface MessageInputProps {
   onChange: (val: string) => void;
   onSend: () => void;
   placeholder?: string;
+  disabled?: boolean;
   onImageSelect?: (file: File) => void;
+  imagePreview?: string | null;
+  onRemoveImage?: () => void;
 }
 
 export interface ConversationHeaderProps {
