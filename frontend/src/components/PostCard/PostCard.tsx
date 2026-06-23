@@ -1,10 +1,12 @@
 "use client";
 
-import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Avatar from "../Avatar/Avatar";
 import PostAction from "../PostAction/PostAction";
 import ShareModal from "../ShareModal/ShareModal";
-import { Heart, MessageCircle, Upload } from "lucide-react";
+import ReportModal from "../ReportModal/ReportModal";
+import { Heart, MessageCircle, Upload, MoreHorizontal, Flag } from "lucide-react";
 import { PostCardProps } from "../../types/PostCardType";
 import { renderContentWithHashtags, truncateAuthor } from "../../utils/TextUtil";
 import { usePostCard } from "../../hooks/usePostCard";
@@ -24,29 +26,43 @@ export default function PostCard({
   onCommentClick,
   onLike,
 }: PostCardProps) {
-  const initialLikes = typeof likes === "number" ? likes : parseInt(likes as string, 10) || 0;
-
   const {
     isLiked,
-    likesCount, 
     isShareModalOpen,
     setIsShareModalOpen,
     postUrl,
     handleCardClick,
     handleLike,
     handleCommentClick,
-    handleShareClick
-  } = usePostCard(id, initialLikes, onRequireAuth, onCommentClick);
+    handleShareClick,
+  } = usePostCard(id, onRequireAuth, onCommentClick, onLike, isLikedProp);
+
+  const router = useRouter();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   const displayAuthor = truncateAuthor(author);
+
+  const handleProfileClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onRequireAuth) { onRequireAuth(); return; }
+    router.push(`/profile/${author}`);
+  };
+
+  const handleMenuOpen = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onRequireAuth) { onRequireAuth(); return; }
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   return (
     <>
       <article onClick={handleCardClick} className="block relative bg-[#A395DA]/[0.14] dark:bg-[#2A2438] rounded-3xl p-4 pt-9 mb-8 ml-4 shadow-[0_2px_15px_rgba(0,0,0,0.03)] dark:shadow-none transition-colors duration-300 cursor-pointer hover:opacity-95">
-        <Link 
-          href={`/profile/${author}`}
+        <button
+          onClick={handleProfileClick}
           className="absolute -top-4 -left-4 flex items-center max-w-[50%] hover:opacity-80 transition-opacity"
-          onClick={(e) => e.stopPropagation()}
         >
           <div className="z-10 relative shrink-0">
             <Avatar src={avatarUrl} alt={author} />
@@ -57,12 +73,31 @@ export default function PostCard({
             </h3>
             <span className="text-[10px] opacity-90 block truncate">{timeAgo}</span>
           </div>
-        </Link>
+        </button>
 
         <div className="absolute top-3 right-4 flex items-center gap-3">
-          <PostAction icon={Heart} count={likesCount} filled={isLiked} onClick={handleLike} />
+          <PostAction icon={Heart} count={likes} filled={isLiked} onClick={handleLike} />
           <PostAction icon={MessageCircle} count={comments} filled={false} onClick={handleCommentClick} />
           <PostAction icon={Upload} count={shares} filled={false} onClick={handleShareClick} />
+          <div className="relative">
+            <button
+              onClick={handleMenuOpen}
+              className="text-[#A395DA] dark:text-[#8B7BB5] hover:text-[#492775] dark:hover:text-[#D0C9E8] transition-colors duration-300 cursor-pointer"
+            >
+              <MoreHorizontal size={18} strokeWidth={2} />
+            </button>
+            {isMenuOpen && (
+              <div className="absolute right-0 top-7 bg-white dark:bg-[#1A1A2E] border border-gray-100 dark:border-gray-700 rounded-2xl shadow-lg z-20 overflow-hidden min-w-[140px]">
+                <button
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsMenuOpen(false); setIsReportModalOpen(true); }}
+                  className="w-full flex items-center gap-2 px-4 py-3 text-[13px] text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                >
+                  <Flag size={14} strokeWidth={2} />
+                  Signaler
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         <p className="text-[12px] text-[#492775] dark:text-[#D0C9E8] font-medium leading-relaxed mt-2 mb-3 transition-colors duration-300">
@@ -76,11 +111,16 @@ export default function PostCard({
         )}
       </article>
 
-      <ShareModal 
-        isOpen={isShareModalOpen} 
-        onClose={() => setIsShareModalOpen(false)} 
-        url={postUrl} 
-        title={`Breezy de ${author}`} 
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        url={postUrl}
+        title={`Breezy de ${author}`}
+      />
+      <ReportModal
+        isOpen={isReportModalOpen}
+        postId={id}
+        onClose={() => setIsReportModalOpen(false)}
       />
     </>
   );

@@ -62,14 +62,14 @@ export default function MessageBubble({ content, isSelf, avatarUrl, isImage, ima
         </Link>
       )}
       
-      <div 
-        className={`max-w-[75%] px-5 py-3.5 shadow-[0_2px_10px_rgba(0,0,0,0.04)] dark:shadow-none transition-colors duration-300 ${
-          isSelf 
-            ? "bg-[#492775] dark:bg-[#6B5B8B] text-white rounded-3xl rounded-br-sm" 
+      <div
+        className={`max-w-[75%] min-w-0 px-5 py-3.5 shadow-[0_2px_10px_rgba(0,0,0,0.04)] dark:shadow-none transition-colors duration-300 ${
+          isSelf
+            ? "bg-[#492775] dark:bg-[#6B5B8B] text-white rounded-3xl rounded-br-sm"
             : "bg-[#F3F0FF] dark:bg-[#2A2438] text-[#1E1E40] dark:text-[#EAE5F3] rounded-3xl rounded-bl-sm"
         }`}
       >
-        <p className="text-[14px] leading-relaxed">
+        <p className="text-[14px] leading-relaxed break-all">
           {renderContentWithHashtags(content)}
         </p>
       </div>

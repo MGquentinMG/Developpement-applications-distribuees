@@ -1,17 +1,34 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { X, Copy, Check, Mail, MessageSquare } from "lucide-react";
 import { ShareModalProps } from "../../types/ModalType";
 import Avatar from "../Avatar/Avatar";
 import { useShareModal } from "../../hooks/useShareModal";
 import { useAuth } from "../../contexts/AuthContext";
+import { api } from "../../services/api";
 import "../../i18n";
+
+interface Contact {
+  _id: string;
+  username: string;
+  avatar?: string;
+}
 
 export default function ShareModal({ isOpen, onClose, url, title }: ShareModalProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { copied, sentTo, handleClose, handleCopy, handleSendToContact } = useShareModal(isOpen, onClose, url);
+  const { copied, sentTo, sending, handleClose, handleCopy, handleSendToContact } = useShareModal(isOpen, onClose, url);
+  const [contacts, setContacts] = useState<Contact[]>([]);
+
+  useEffect(() => {
+    if (isOpen && user) {
+      api.get<Contact[]>(`/api/users/${user._id}/following`)
+        .then((data) => setContacts(Array.isArray(data) ? data : []))
+        .catch(() => setContacts([]));
+    }
+  }, [isOpen, user]);
 
   if (!isOpen) return null;
 
@@ -19,8 +36,6 @@ export default function ShareModal({ isOpen, onClose, url, title }: ShareModalPr
     { icon: MessageSquare, name: t("share.message"), color: "bg-[#25D366]", href: `sms:?&body=${encodeURIComponent(url)}` },
     { icon: Mail, name: t("share.email"), color: "bg-gray-500", href: `mailto:?subject=${encodeURIComponent(title || "")}&body=${encodeURIComponent(url)}` },
   ];
-
-  const contacts = (user?.following ?? []) as { _id: string; username: string; avatar?: string }[];
 
   return (
     <div className="fixed inset-0 z-[100] flex justify-center items-end bg-black/50 backdrop-blur-sm transition-opacity" onClick={handleClose}>
@@ -54,14 +69,16 @@ export default function ShareModal({ isOpen, onClose, url, title }: ShareModalPr
                   </span>
                   <button
                     onClick={() => handleSendToContact(contact._id)}
-                    disabled={isSent}
+                    disabled={isSent || sending === contact._id}
                     className={`text-[11px] font-bold px-4 py-1.5 rounded-full transition-colors w-full cursor-pointer ${
                       isSent
                         ? "bg-gray-100 dark:bg-[#2A2438] text-gray-400 dark:text-gray-500"
+                        : sending === contact._id
+                        ? "bg-[#A395DA] text-white opacity-70"
                         : "bg-[#492775] text-white hover:bg-[#3a1f5d]"
                     }`}
                   >
-                    {isSent ? t("share.sent") : t("share.send")}
+                    {isSent ? t("share.sent") : sending === contact._id ? "..." : t("share.send")}
                   </button>
                 </div>
               );

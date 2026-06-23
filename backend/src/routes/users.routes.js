@@ -6,7 +6,16 @@ const errorResponse = require("../utils/errorResponse");
 
 module.exports = async function (fastify, opts) {
 
-  fastify.get("/me", 
+  fastify.get("/", { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    try {
+      const users = await User.find({ _id: { $ne: req.user.id } }).select("-password").sort({ createdAt: -1 });
+      return successResponse(reply, users);
+    } catch (err) {
+      return errorResponse(reply, "Erreur", 500);
+    }
+  });
+
+  fastify.get("/me",
     { 
       onRequest: [fastify.authenticate]
     }, 
@@ -168,6 +177,17 @@ module.exports = async function (fastify, opts) {
         .populate("author", "username avatar")
         .sort({ createdAt: -1 });
       return successResponse(reply, posts);
+    } catch (err) {
+      return errorResponse(reply, "Erreur", 500);
+    }
+  });
+
+  fastify.delete("/:id", { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    try {
+      if (req.user.role !== "admin") return errorResponse(reply, "Non autorisé", 403);
+      await User.findByIdAndDelete(req.params.id);
+      await Post.deleteMany({ author: req.params.id });
+      return successResponse(reply, null, "Utilisateur supprimé");
     } catch (err) {
       return errorResponse(reply, "Erreur", 500);
     }
