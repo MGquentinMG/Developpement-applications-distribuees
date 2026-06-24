@@ -9,4 +9,5 @@ export interface CommentProps {
   isLiked?: boolean;
   onLike?: () => void;
   onReply?: (author: string) => void;
+  onReport?: () => void;
 }

@@ -47,6 +47,12 @@ const UserSchema = new mongoose.Schema(
         ref: "User"
       }
     ],
+    status: {
+      type: String,
+      enum: ["pending", "active"],
+      default: "active"
+    },
+
     banned: {
       type: Boolean,
       default: false

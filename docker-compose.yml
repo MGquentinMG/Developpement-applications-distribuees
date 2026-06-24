@@ -6,37 +6,35 @@ services:
     restart: unless-stopped
     cap_add:
       - IPC_LOCK
-    # Dev mode : auto-initialisé, auto-unsealed, root token connu
-    command: vault server -dev -dev-root-token-id=breezy_dev_root -dev-listen-address=0.0.0.0:8200
     environment:
       VAULT_DEV_ROOT_TOKEN_ID: breezy_dev_root
-      VAULT_ADDR: "http://127.0.0.1:8200"
+      VAULT_ADDR: http://127.0.0.1:8200
+    command: vault server -dev -dev-root-token-id=breezy_dev_root -dev-listen-address=0.0.0.0:8200
     ports:
       - "8200:8200"
     networks:
       - secrets
     healthcheck:
-      test: ["CMD", "sh", "-c", "wget -q -O- http://127.0.0.1:8200/v1/sys/health"]
+      test: ["CMD", "vault", "status", "-address=http://127.0.0.1:8200"]
       interval: 5s
-      timeout: 2s
+      timeout: 5s
       retries: 10
-      start_period: 3s
 
   vault-init:
     image: hashicorp/vault:1.17
     container_name: vault-init
-    restart: "no"
+    entrypoint: ["sh", "/vault/init.sh"]
     environment:
-      VAULT_ADDR: "http://vault:8200"
       VAULT_TOKEN: breezy_dev_root
+      VAULT_ADDR: http://vault:8200
     volumes:
-      - ./backend/vault:/vault:rw
+      - ./backend/vault:/vault
     networks:
       - secrets
     depends_on:
       vault:
         condition: service_healthy
-    entrypoint: ["/bin/sh", "-c", "tr -d '\\r' < /vault/init.sh > /tmp/init.sh && sh /tmp/init.sh"]
+    restart: "no"
 
   mongo-secure:
     image: mongo:7
@@ -51,11 +49,10 @@ services:
     networks:
       - data
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')", "--quiet"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 3s
 
   breezy_app:
     build:
@@ -63,14 +60,15 @@ services:
       dockerfile: Dockerfile
     container_name: breezy_app
     restart: unless-stopped
-    env_file: ./backend/.env
     environment:
-      VAULT_ADDR: "http://vault:8200"
+      PORT: "5000"
+      MONGO_URI: mongodb://admin:supersecretpassword123@mongo-secure:27017/ma_db?authSource=admin
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: breezy_dev_root
+      JWT_SECRET: breezy_dev_fallback_change_in_prod
     volumes:
       - ./backend/vault:/vault:ro
       - ./backend/uploads:/app/uploads
-    expose:
-      - "5000"
     networks:
       - app
       - data
@@ -81,46 +79,58 @@ services:
       vault-init:
         condition: service_completed_successfully
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        NEXT_PUBLIC_API_URL: http://localhost
-    container_name: frontend
-    restart: unless-stopped
-    expose:
-      - "3000"
-    networks:
-      - frontend
-    depends_on:
-      breezy_app:
-        condition: service_started
-
   nginx:
     image: owasp/modsecurity-crs:nginx-alpine
     container_name: nginx
     restart: unless-stopped
     ports:
       - "80:80"
+    environment:
+      ANOMALY_INBOUND: "5"
+      ANOMALY_OUTBOUND: "4"
+      BLOCKING_PARANOIA: "1"
+      ALLOWED_METHODS: "GET HEAD POST OPTIONS PUT PATCH DELETE"
     volumes:
       - ./backend/nginx/nginx.conf:/etc/nginx/conf.d/breezy.conf
     networks:
-      - frontend
       - app
+      - frontend
     depends_on:
       - breezy_app
       - frontend
 
-networks:
   frontend:
-    driver: bridge
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: unless-stopped
+    networks:
+      - frontend
+
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: mongo-express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: supersecretpassword123
+      ME_CONFIG_MONGODB_URL: mongodb://admin:supersecretpassword123@mongo-secure:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin123
+    networks:
+      - data
+    depends_on:
+      mongo-secure:
+        condition: service_healthy
+
+networks:
   app:
-    driver: bridge
   data:
-    driver: bridge
+  frontend:
   secrets:
-    driver: bridge
 
 volumes:
   mongo_data:

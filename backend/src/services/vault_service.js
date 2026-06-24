@@ -1,38 +1,15 @@
-const fs = require("fs");
+const VAULT_ADDR = process.env.VAULT_ADDR;
+const VAULT_TOKEN = process.env.VAULT_TOKEN;
+const VAULT_ROLE_ID = process.env.VAULT_ROLE_ID;
+const VAULT_SECRET_ID = process.env.VAULT_SECRET_ID;
 
-const VAULT_ADDR = process.env.VAULT_ADDR || "http://localhost:8200";
+let vaultToken = VAULT_TOKEN || null;
 
-let cachedToken = null;
-let tokenExpiry = 0;
-
-// Lit les credentials depuis /vault/keys.env (bind-monté par Docker depuis backend/vault/)
-function readKeysFile() {
-  try {
-    const content = fs.readFileSync("/vault/keys.env", "utf8");
-    // tr -d '\r' pour gérer les fichiers écrits sur Windows
-    const roleId = content.match(/APP_VAULT_ROLE_ID=([^\r\n]+)/)?.[1]?.trim();
-    const secretId = content.match(/APP_VAULT_SECRET_ID=([^\r\n]+)/)?.[1]?.trim();
-    return { roleId, secretId };
-  } catch {
-    return {};
+async function authenticate() {
+  if (VAULT_TOKEN) {
+    vaultToken = VAULT_TOKEN;
+    return;
   }
-}
-
-async function getVaultToken(forceRefresh = false) {
-  if (!forceRefresh && cachedToken && Date.now() < tokenExpiry) return cachedToken;
-
-  // /vault/keys.env en priorité (toujours à jour après init), puis env vars en fallback
-  let roleId, secretId;
-  const fromFile = readKeysFile();
-  if (fromFile.roleId && fromFile.secretId) {
-    roleId = fromFile.roleId;
-    secretId = fromFile.secretId;
-  } else {
-    roleId = process.env.APP_VAULT_ROLE_ID || process.env.VAULT_ROLE_ID;
-    secretId = process.env.APP_VAULT_SECRET_ID || process.env.VAULT_SECRET_ID;
-  }
-
-  if (!roleId || !secretId) throw new Error("No Vault AppRole credentials");
 
   const res = await fetch(`${VAULT_ADDR}/v1/auth/approle/login`, {
     method: "POST",
@@ -40,31 +17,46 @@ async function getVaultToken(forceRefresh = false) {
     body: JSON.stringify({ role_id: roleId, secret_id: secretId }),
   });
 
-  if (!res.ok) throw new Error(`Vault AppRole auth failed: ${res.statusText}`);
+  if (!res.ok) {
+    throw new Error(`Impossible de s'authentifier à Vault via AppRole: ${res.statusText}`);
+  }
 
   const data = await res.json();
-  cachedToken = data.auth.client_token;
-  tokenExpiry = Date.now() + (data.auth.lease_duration - 60) * 1000;
-  return cachedToken;
+  vaultToken = data.auth.client_token;
 }
 
-async function getPublicKey() {
-  try {
-    const token = await getVaultToken();
-    const res = await fetch(`${VAULT_ADDR}/v1/transit/keys/jwt-key`, {
-      headers: { "X-Vault-Token": token },
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    const latest = String(data.data.latest_version);
-    return data.data.keys[latest].public_key;
-  } catch {
-    return null; // Vault indisponible → fallback JWT_SECRET
+async function getToken(forceRefresh = false) {
+  if (!vaultToken || forceRefresh) {
+    await authenticate();
   }
+  return vaultToken;
+}
+
+async function getPublicKey(retries = 15, delayMs = 2000) {
+  for (let i = 0; i < retries; i++) {
+    const token = await getToken();
+    const res = await fetch(`${VAULT_ADDR}/v1/transit/keys/jwt-key`, {
+      headers: { "X-Vault-Token": token }
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.data?.keys?.["1"]?.public_key) {
+        return data.data.keys["1"].public_key;
+      }
+    }
+
+    const remaining = retries - 1 - i;
+    if (remaining > 0) {
+      console.log(`Vault pas encore prêt (tentative ${i + 1}/${retries}), nouvelle tentative dans ${delayMs}ms...`);
+      await new Promise(r => setTimeout(r, delayMs));
+    }
+  }
+  throw new Error(`Impossible de récupérer la clé publique depuis Vault après ${retries} tentatives`);
 }
 
 async function signWithVault(payload, retry = true) {
-  const token = await getVaultToken(!retry);
+  const token = await getToken(!retry);
 
   const header = Buffer.from(JSON.stringify({ alg: "ES256", typ: "JWT" })).toString("base64url");
   const now = Math.floor(Date.now() / 1000);
@@ -82,12 +74,17 @@ async function signWithVault(payload, retry = true) {
     }),
   });
 
-  if ((res.status === 403 || res.status === 400) && retry) {
-    cachedToken = null;
-    return signWithVault(payload, false);
-  }
+  if (res.status === 403 || res.status === 400) {
+    const errorData = await res.json();
+    const isTokenError = errorData.errors?.some(e => e.includes("permission denied") || e.includes("invalid token"));
 
-  if (!res.ok) throw new Error(`Vault sign failed: ${res.statusText}`);
+    if (isTokenError && retry) {
+      vaultToken = null;
+      return signWithVault(payload, false);
+    }
+
+    throw new Error(`Vault sign error: ${JSON.stringify(errorData)}`);
+  }
 
   const data = await res.json();
   const signature = data.data.signature.replace("vault:v1:", "");

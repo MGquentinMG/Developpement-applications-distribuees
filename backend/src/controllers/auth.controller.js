@@ -20,7 +20,8 @@ exports.register = async (req, reply) => {
       username,
       email,
       password: hashedPassword,
-      age
+      age,
+      status: "pending"
     });
 
     return successResponse(reply, { id: user._id, email: user.email }, "Utilisateur créé", 201);
@@ -37,6 +38,14 @@ exports.login = async (req, reply) => {
     // Vérification de l'existence et du mot de passe
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return errorResponse(reply, "Email ou mot de passe incorrect", 401);
+    }
+
+    if (user.status === "pending") {
+      return errorResponse(reply, "Votre compte est en attente de validation par un administrateur", 403);
+    }
+
+    if (user.banned) {
+      return errorResponse(reply, "Votre compte a été suspendu", 403);
     }
 
     const token = await req.server.signJWT({

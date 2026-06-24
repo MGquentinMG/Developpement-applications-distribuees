@@ -1,27 +1,16 @@
-FROM node:20-alpine AS builder
+FROM node:20-alpine
+
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm ci
+COPY --chown=appuser:appgroup package*.json ./
+RUN npm install
 
-COPY . .
-
-# NEXT_PUBLIC_* doit être fourni à BUILD TIME (embarqué dans le bundle JS)
-ARG NEXT_PUBLIC_API_URL=http://localhost
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-
+COPY --chown=appuser:appgroup . .
 RUN npm run build
 
-# ── Runner ──────────────────────────────────────────────────────────────────
-FROM node:20-alpine AS runner
-WORKDIR /app
-
-ENV NODE_ENV=production
-
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
+USER appuser
 
 EXPOSE 3000
 

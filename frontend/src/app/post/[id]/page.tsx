@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import BackButton from "../../../components/BackButton/BackButton";
 import PostCard from "../../../components/PostCard/PostCard";
 import CommentCard from "../../../components/CommentCard/CommentCard";
+import ReportModal from "../../../components/ReportModal/ReportModal";
 import MessageInput from "../../../components/MessageInput/MessageInput";
 import { api, timeAgo, formatCount } from "../../../services/api";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -41,6 +42,7 @@ export default function PostDetailsPage() {
   const [commentImagePreview, setCommentImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [reportingCommentId, setReportingCommentId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!postId) return;
@@ -194,6 +196,7 @@ export default function PostDetailsPage() {
                 isLiked={user ? (comment.likes ?? []).includes(user._id) : false}
                 onLike={() => handleLikeComment(comment._id)}
                 onReply={handleReply}
+                onReport={user ? () => setReportingCommentId(comment._id) : undefined}
               />
             ))}
           </div>
@@ -209,6 +212,12 @@ export default function PostDetailsPage() {
         onRemoveImage={handleRemoveCommentImage}
         placeholder={user ? "Ajouter un commentaire..." : "Connecte-toi pour commenter"}
         disabled={!user || sending}
+      />
+
+      <ReportModal
+        isOpen={reportingCommentId !== null}
+        commentId={reportingCommentId ?? undefined}
+        onClose={() => setReportingCommentId(null)}
       />
     </main>
   );

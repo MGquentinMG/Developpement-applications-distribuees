@@ -6,10 +6,11 @@ module.exports = async function (fastify, opts) {
   // Créer un rapport
   fastify.post("/", { onRequest: [fastify.authenticate] }, async (req, reply) => {
     try {
-      const { reportedPostId, reportedUserId, reason, description } = req.body;
+      const { reportedPostId, reportedCommentId, reportedUserId, reason, description } = req.body;
 
       const report = await Report.create({
         reportedPost: reportedPostId,
+        reportedComment: reportedCommentId,
         reportedUser: reportedUserId,
         reporter: req.user.id,
         reason,
@@ -31,6 +32,11 @@ module.exports = async function (fastify, opts) {
         .populate({
           path: "reportedPost",
           select: "content image author",
+          populate: { path: "author", select: "username _id" },
+        })
+        .populate({
+          path: "reportedComment",
+          select: "content author",
           populate: { path: "author", select: "username _id" },
         })
         .populate("reportedUser", "username email")

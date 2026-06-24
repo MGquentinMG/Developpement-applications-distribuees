@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Post = require("../models/Post");
 const Notification = require("../models/Notification");
+const bcrypt = require("bcryptjs");
 const successResponse = require("../utils/successResponse");
 const errorResponse = require("../utils/errorResponse");
 
@@ -32,6 +33,66 @@ module.exports = async function (fastify, opts) {
     }
   );
 
+
+  // Comptes en attente de validation (admin)
+  fastify.get("/pending", { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    try {
+      if (req.user.role !== "admin") return errorResponse(reply, "Non autorisé", 403);
+      const users = await User.find({ status: "pending" }).select("-password").sort({ createdAt: -1 });
+      return successResponse(reply, users);
+    } catch (err) {
+      return errorResponse(reply, "Erreur", 500);
+    }
+  });
+
+  // Approuver un compte (admin)
+  fastify.patch("/:id/approve", { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    try {
+      if (req.user.role !== "admin") return errorResponse(reply, "Non autorisé", 403);
+      const user = await User.findByIdAndUpdate(req.params.id, { status: "active" }, { new: true }).select("-password");
+      if (!user) return errorResponse(reply, "Utilisateur non trouvé", 404);
+      return successResponse(reply, user, "Compte approuvé");
+    } catch (err) {
+      return errorResponse(reply, "Erreur", 500);
+    }
+  });
+
+  // Changer le rôle d'un utilisateur (admin)
+  fastify.patch("/:id/role", { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    try {
+      if (req.user.role !== "admin") return errorResponse(reply, "Non autorisé", 403);
+      const { role } = req.body;
+      if (!["user", "moderator", "admin"].includes(role)) return errorResponse(reply, "Rôle invalide", 400);
+      const user = await User.findByIdAndUpdate(req.params.id, { role }, { new: true }).select("-password");
+      if (!user) return errorResponse(reply, "Utilisateur non trouvé", 404);
+      return successResponse(reply, user, "Rôle mis à jour");
+    } catch (err) {
+      return errorResponse(reply, "Erreur", 500);
+    }
+  });
+
+  // Créer un compte depuis l'admin (avec rôle)
+  fastify.post("/admin-create", { onRequest: [fastify.authenticate] }, async (req, reply) => {
+    try {
+      if (req.user.role !== "admin") return errorResponse(reply, "Non autorisé", 403);
+      const { username, email, password, age, role } = req.body;
+      if (!username || !email || !password) return errorResponse(reply, "Champs requis manquants", 400);
+      const existing = await User.findOne({ $or: [{ email }, { username }] });
+      if (existing) return errorResponse(reply, "Nom d'utilisateur ou email déjà utilisé", 409);
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = await User.create({
+        username,
+        email,
+        password: hashedPassword,
+        age: age || 18,
+        role: role || "user",
+        status: "active"
+      });
+      return successResponse(reply, { id: user._id, username: user.username, email: user.email, role: user.role }, "Compte créé", 201);
+    } catch (err) {
+      return errorResponse(reply, "Erreur serveur", 500);
+    }
+  });
 
   fastify.get("/by-username/:username", async (req, reply) => {
     try {

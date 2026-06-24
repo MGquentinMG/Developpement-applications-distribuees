@@ -3,6 +3,7 @@
 import React, { useState, FormEvent, ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 import "../../i18n";
+import { InputField } from "../Auth/InputField";
 import { api } from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
 

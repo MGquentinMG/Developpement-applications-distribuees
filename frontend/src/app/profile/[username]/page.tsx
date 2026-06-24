@@ -27,7 +27,7 @@ export default function UserProfilePage() {
   const params = useParams();
   const router = useRouter();
   const username = params?.username as string;
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, updateUser } = useAuth();
 
   const [profile, setProfile] = useState<ApiUser | null>(null);
   const [posts, setPosts] = useState<ApiPost[]>([]);
@@ -63,6 +63,9 @@ export default function UserProfilePage() {
             : prev
         );
         setIsFollowing(false);
+        updateUser({
+          following: (currentUser.following ?? []).filter((f) => f._id !== profile._id),
+        });
       } else {
         await api.post(`/api/users/${profile._id}/follow`, {});
         setProfile((prev) =>
@@ -74,6 +77,9 @@ export default function UserProfilePage() {
             : prev
         );
         setIsFollowing(true);
+        updateUser({
+          following: [...(currentUser.following ?? []), { _id: profile._id, username: profile.username }],
+        });
       }
     } catch {
     } finally {
