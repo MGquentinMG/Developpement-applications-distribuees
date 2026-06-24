@@ -68,6 +68,7 @@ services:
       VAULT_ADDR: "http://vault:8200"
     volumes:
       - ./backend/vault:/vault:ro
+      - ./backend/uploads:/app/uploads
     expose:
       - "5000"
     networks:

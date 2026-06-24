@@ -90,7 +90,7 @@ module.exports = async function (fastify, opts) {
         if (!userToFollow) return errorResponse(reply, "User non trouvé", 404);
 
 
-        if (userToFollow.followers.includes(req.user.id)) {
+        if (userToFollow.followers.some(id => id.toString() === req.user.id)) {
           return errorResponse(reply, "Vous suivez déjà cet utilisateur", 400);
         }
 
