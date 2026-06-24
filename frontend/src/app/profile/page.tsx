@@ -29,12 +29,14 @@ export default function ProfilePage() {
   const [editAvatarPreview, setEditAvatarPreview] = useState<string | null>(null);
   const [editAvatarFile, setEditAvatarFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const openEdit = () => {
     setEditBio(user?.bio ?? "");
     setEditAvatarPreview(null);
     setEditAvatarFile(null);
+    setSaveError("");
     setEditOpen(true);
   };
 
@@ -47,6 +49,7 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     setSaving(true);
+    setSaveError("");
     try {
       let avatarUrl: string | undefined;
       if (editAvatarFile) {
@@ -57,7 +60,8 @@ export default function ProfilePage() {
       await api.patch("/api/users/me", payload);
       updateUser({ bio: editBio, ...(avatarUrl ? { avatar: avatarUrl } : {}) });
       setEditOpen(false);
-    } catch {
+    } catch (err: unknown) {
+      setSaveError(err instanceof Error ? err.message : "Erreur lors de l'enregistrement");
     } finally {
       setSaving(false);
     }
@@ -238,6 +242,10 @@ export default function ProfilePage() {
                 {editBio.length}/160
               </p>
             </div>
+
+            {saveError && (
+              <p className="text-red-500 text-[12px] text-center mb-2">{saveError}</p>
+            )}
 
             <div className="flex gap-3">
               <button

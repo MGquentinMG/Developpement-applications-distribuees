@@ -4,12 +4,11 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm ci --only=production
+COPY --chown=appuser:appgroup package*.json ./
+RUN npm install --only=production
 
-COPY . .
+COPY --chown=appuser:appgroup . .
 
-RUN chown -R appuser:appgroup /app
 USER appuser
 
 EXPOSE 5000

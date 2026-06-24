@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { api } from "../../services/api";
 import { AdminConfirmModal } from "./AdminConfirmModal";
 
@@ -12,6 +13,11 @@ interface ApiReport {
     image?: string;
     author?: { _id: string; username: string };
   };
+  reportedComment?: {
+    _id: string;
+    content: string;
+    author?: { _id: string; username: string };
+  };
   reportedUser?: { _id: string; username: string; email: string };
   reporter: { _id: string; username: string };
   reason: string;
@@ -20,23 +26,17 @@ interface ApiReport {
   createdAt: string;
 }
 
-type ActionType = "ignore" | "deletePost" | "banAndDelete";
+type ActionType = "ignore" | "deletePost" | "banAndDelete" | "deleteComment" | "banAndDeleteComment";
 
 interface PendingAction {
   type: ActionType;
   reportId: string;
   postId?: string;
+  commentId?: string;
   userId?: string;
   title: string;
   description: string;
 }
-
-const REASON_LABELS: Record<string, string> = {
-  spam: "Spam",
-  harassment: "Harcèlement",
-  inappropriate: "Contenu inapproprié",
-  other: "Autre",
-};
 
 const STATUS_STYLES: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
@@ -44,16 +44,29 @@ const STATUS_STYLES: Record<string, string> = {
   resolved: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  pending: "En attente",
-  reviewed: "En cours",
-  resolved: "Résolu",
-};
-
 export function AdminReports() {
+  const { t } = useTranslation();
   const [reports, setReports] = useState<ApiReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
+
+  const STATUS_LABELS: Record<string, string> = {
+    pending: t("admin.statusPending", "En attente"),
+    reviewed: t("admin.statusReviewed", "En cours"),
+    resolved: t("admin.statusResolved", "Résolu"),
+  };
+
+  const REASON_LABELS: Record<string, string> = {
+    spam: t("admin.reasonSpam", "Spam"),
+    harassment: t("admin.reasonHarassment", "Harcèlement"),
+    inappropriate: t("admin.reasonInappropriate", "Contenu inapproprié"),
+    hate: t("admin.reasonHate", "Incitation à la haine"),
+    violence: t("admin.reasonViolence", "Violence"),
+    disinfo: t("admin.reasonDisinfo", "Désinformation"),
+    illegal: t("admin.reasonIllegal", "Activités illégales"),
+    fraud: t("admin.reasonFraud", "Fraudes"),
+    other: t("admin.reasonOther", "Autre"),
+  };
 
   useEffect(() => {
     api
@@ -73,6 +86,11 @@ export function AdminReports() {
       } else if (pendingAction.type === "banAndDelete" && pendingAction.userId && pendingAction.postId) {
         await api.patch(`/api/users/${pendingAction.userId}/ban`, { banReason: _reason });
         await api.delete(`/api/moderation/posts/${pendingAction.postId}`);
+      } else if (pendingAction.type === "deleteComment" && pendingAction.commentId) {
+        await api.delete(`/api/moderation/comments/${pendingAction.commentId}`);
+      } else if (pendingAction.type === "banAndDeleteComment" && pendingAction.userId && pendingAction.commentId) {
+        await api.patch(`/api/users/${pendingAction.userId}/ban`, { banReason: _reason });
+        await api.delete(`/api/moderation/comments/${pendingAction.commentId}`);
       }
       await api.patch(`/api/reports/${pendingAction.reportId}`, { status: "resolved" });
       setReports((prev) =>
@@ -83,14 +101,14 @@ export function AdminReports() {
   };
 
   if (loading) {
-    return <p className="text-center text-gray-400 mt-10 text-sm">Chargement...</p>;
+    return <p className="text-center text-gray-400 mt-10 text-sm">{t("admin.loading", "Chargement...")}</p>;
   }
 
   if (reports.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-        <p className="font-medium text-lg">Aucun signalement</p>
-        <p className="text-sm mt-1">Tout est calme par ici.</p>
+        <p className="font-medium text-lg">{t("admin.noReports", "Aucun signalement")}</p>
+        <p className="text-sm mt-1">{t("admin.noReportsDesc", "Tout est calme par ici.")}</p>
       </div>
     );
   }
@@ -131,13 +149,29 @@ export function AdminReports() {
                 )}
                 <div className="px-4 py-3">
                   <p className="text-[11px] font-bold text-[#A69ACA] uppercase tracking-wide mb-1">
-                    Post signalé
+                    {t("admin.reportedPost", "Post signalé")}
                     {report.reportedPost.author && (
                       <span className="ml-2 font-normal normal-case text-gray-400">par @{report.reportedPost.author.username}</span>
                     )}
                   </p>
                   <p className="text-[13px] text-[#1E1E40] dark:text-[#F9F9FB] line-clamp-3">
-                    {report.reportedPost.content || "(sans texte)"}
+                    {report.reportedPost.content || t("admin.noText", "(sans texte)")}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {report.reportedComment && (
+              <div className="bg-[#F4F2F9] dark:bg-[#2A2438] rounded-2xl overflow-hidden mb-3">
+                <div className="px-4 py-3">
+                  <p className="text-[11px] font-bold text-[#A69ACA] uppercase tracking-wide mb-1">
+                    {t("admin.reportedComment", "Commentaire signalé")}
+                    {report.reportedComment.author && (
+                      <span className="ml-2 font-normal normal-case text-gray-400">par @{report.reportedComment.author.username}</span>
+                    )}
+                  </p>
+                  <p className="text-[13px] text-[#1E1E40] dark:text-[#F9F9FB] line-clamp-3">
+                    {report.reportedComment.content || t("admin.noText", "(sans texte)")}
                   </p>
                 </div>
               </div>
@@ -145,14 +179,17 @@ export function AdminReports() {
 
             {report.description && (
               <div className="mb-3">
-                <p className="text-[11px] font-bold text-[#A69ACA] uppercase tracking-wide mb-1">Justificatif du signalement</p>
+                <p className="text-[11px] font-bold text-[#A69ACA] uppercase tracking-wide mb-1">
+                  {t("admin.reportJustif", "Justificatif du signalement")}
+                </p>
                 <p className="text-[13px] text-gray-600 dark:text-gray-300 italic">"{report.description}"</p>
               </div>
             )}
 
             <div className="flex items-center justify-between flex-wrap gap-3">
               <p className="text-[12px] text-gray-500 dark:text-gray-400">
-                Signalé par <span className="font-semibold text-[#492775] dark:text-[#A395DA]">@{report.reporter?.username}</span>
+                {t("admin.reportedBy", "Signalé par")}{" "}
+                <span className="font-semibold text-[#492775] dark:text-[#A395DA]">@{report.reporter?.username}</span>
               </p>
 
               {report.status !== "resolved" && (
@@ -161,12 +198,12 @@ export function AdminReports() {
                     onClick={() => openAction({
                       type: "ignore",
                       reportId: report._id,
-                      title: "Ne rien faire",
+                      title: t("admin.ignore", "Ne rien faire"),
                       description: "Le signalement sera marqué comme résolu sans aucune action sur le contenu.",
                     })}
                     className="px-3 py-1.5 rounded-xl text-[12px] font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 transition-colors"
                   >
-                    Ne rien faire
+                    {t("admin.ignore", "Ne rien faire")}
                   </button>
 
                   {report.reportedPost && (
@@ -176,12 +213,12 @@ export function AdminReports() {
                           type: "deletePost",
                           reportId: report._id,
                           postId: report.reportedPost!._id,
-                          title: "Supprimer le post",
+                          title: t("admin.deletePostBtn", "Supprimer le post"),
                           description: "Le post sera définitivement supprimé. Le compte de l'auteur ne sera pas affecté.",
                         })}
                         className="px-3 py-1.5 rounded-xl text-[12px] font-semibold bg-orange-50 text-orange-600 hover:bg-orange-100 dark:bg-orange-900/20 dark:text-orange-400 transition-colors"
                       >
-                        Supprimer le post
+                        {t("admin.deletePostBtn", "Supprimer le post")}
                       </button>
 
                       {(report.reportedPost.author || report.reportedUser) && (
@@ -191,12 +228,45 @@ export function AdminReports() {
                             reportId: report._id,
                             postId: report.reportedPost!._id,
                             userId: report.reportedPost!.author?._id ?? report.reportedUser?._id,
-                            title: "Bannir + supprimer le post",
+                            title: t("admin.banAndDelete", "Bannir + supprimer le post"),
                             description: "Le post sera supprimé et l'auteur sera banni définitivement.",
                           })}
                           className="px-3 py-1.5 rounded-xl text-[12px] font-semibold bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 transition-colors"
                         >
-                          Bannir + supprimer
+                          {t("admin.banAndDelete", "Bannir + supprimer")}
+                        </button>
+                      )}
+                    </>
+                  )}
+
+                  {report.reportedComment && (
+                    <>
+                      <button
+                        onClick={() => openAction({
+                          type: "deleteComment",
+                          reportId: report._id,
+                          commentId: report.reportedComment!._id,
+                          title: t("admin.deleteCommentBtn", "Supprimer le commentaire"),
+                          description: "Le commentaire sera définitivement supprimé. Le compte de l'auteur ne sera pas affecté.",
+                        })}
+                        className="px-3 py-1.5 rounded-xl text-[12px] font-semibold bg-orange-50 text-orange-600 hover:bg-orange-100 dark:bg-orange-900/20 dark:text-orange-400 transition-colors"
+                      >
+                        {t("admin.deleteCommentBtn", "Supprimer le commentaire")}
+                      </button>
+
+                      {(report.reportedComment.author || report.reportedUser) && (
+                        <button
+                          onClick={() => openAction({
+                            type: "banAndDeleteComment",
+                            reportId: report._id,
+                            commentId: report.reportedComment!._id,
+                            userId: report.reportedComment!.author?._id ?? report.reportedUser?._id,
+                            title: t("admin.banAndDelete", "Bannir + supprimer"),
+                            description: "Le commentaire sera supprimé et l'auteur sera banni définitivement.",
+                          })}
+                          className="px-3 py-1.5 rounded-xl text-[12px] font-semibold bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 transition-colors"
+                        >
+                          {t("admin.banAndDelete", "Bannir + supprimer")}
                         </button>
                       )}
                     </>

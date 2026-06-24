@@ -31,7 +31,7 @@ export function AdminUserList({ users, searchTerm, onSearchChange, selectedUserI
             }`}
           >
             <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 shrink-0 overflow-hidden border border-gray-100 dark:border-gray-600">
-               <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.pseudo}`} alt={t("admin.avatarAlt", "Avatar")} className="w-full h-full object-cover" />
+               <img src={user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.pseudo}`} alt={t("admin.avatarAlt", "Avatar")} className="w-full h-full object-cover" />
             </div>
             <div className="flex-1 overflow-hidden">
               <p className="font-bold text-[#1A1A2E] dark:text-[#F9F9FB] truncate">{user.pseudo}</p>

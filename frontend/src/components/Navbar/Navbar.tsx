@@ -22,7 +22,7 @@ export default function Navbar() {
   const dynamicLinks = [...navLinks];
   
   // LOGIQUE RESTAURÉE : Vérifie le vrai rôle de l'utilisateur
-  if (user?.role === "admin" && !dynamicLinks.some(link => link.href === "/admin")) {
+  if ((user?.role === "admin" || user?.role === "moderator") && !dynamicLinks.some(link => link.href === "/admin")) {
     dynamicLinks.push({ name: "Admin", href: "/admin", icon: Shield });
   }
 

@@ -6,7 +6,8 @@ import { api } from "../../services/api";
 
 interface ReportModalProps {
   isOpen: boolean;
-  postId: string | number;
+  postId?: string | number;
+  commentId?: string | number;
   onClose: () => void;
 }
 
@@ -17,7 +18,7 @@ const REASONS = [
   { value: "other", label: "Autre" },
 ];
 
-export default function ReportModal({ isOpen, postId, onClose }: ReportModalProps) {
+export default function ReportModal({ isOpen, postId, commentId, onClose }: ReportModalProps) {
   const [reason, setReason] = useState("");
   const [description, setDescription] = useState("");
   const [sending, setSending] = useState(false);
@@ -29,7 +30,10 @@ export default function ReportModal({ isOpen, postId, onClose }: ReportModalProp
     if (!reason) return;
     setSending(true);
     try {
-      await api.post("/api/reports", { reportedPostId: postId, reason, description });
+      const payload = commentId
+        ? { reportedCommentId: commentId, reason, description }
+        : { reportedPostId: postId, reason, description };
+      await api.post("/api/reports", payload);
       setSent(true);
     } catch {
     } finally {
@@ -48,7 +52,7 @@ export default function ReportModal({ isOpen, postId, onClose }: ReportModalProp
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4" onClick={handleClose}>
       <div className="bg-white dark:bg-[#1A1A2E] rounded-3xl p-6 w-full max-w-sm shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
-          <h2 className="font-bold text-[17px] text-[#1E1E40] dark:text-[#F9F9FB]">Signaler ce post</h2>
+          <h2 className="font-bold text-[17px] text-[#1E1E40] dark:text-[#F9F9FB]">{commentId ? "Signaler ce commentaire" : "Signaler ce post"}</h2>
           <button onClick={handleClose} className="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#2A2438] flex items-center justify-center text-gray-500 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#3A304D] transition-colors">
             <X size={16} />
           </button>

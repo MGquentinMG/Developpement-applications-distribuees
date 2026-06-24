@@ -5,13 +5,14 @@ import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import Avatar from "../Avatar/Avatar";
 import PostAction from "../PostAction/PostAction";
-import { Heart, MessageCircle } from "lucide-react";
+import { Heart, MessageCircle, MoreHorizontal, Flag } from "lucide-react";
 import { CommentProps } from "../../types/CommentType";
 import "../../i18n";
 
-export default function CommentCard({ id, author, timeAgo, content, likes, avatarUrl, imageUrl, isLiked: isLikedProp, onLike, onReply }: CommentProps) {
+export default function CommentCard({ id, author, timeAgo, content, likes, avatarUrl, imageUrl, isLiked: isLikedProp, onLike, onReply, onReport }: CommentProps) {
   const { t } = useTranslation();
   const [isLiked, setIsLiked] = useState(isLikedProp ?? false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div className="flex gap-3 mb-5">
@@ -23,7 +24,30 @@ export default function CommentCard({ id, author, timeAgo, content, likes, avata
           <Link href={`/profile/${author}`} className="font-bold text-[13px] text-[#1E1E40] dark:text-[#F9F9FB] hover:underline">
             {author}
           </Link>
-          <span className="text-[10px] text-gray-500 dark:text-[#A395DA]">{timeAgo}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-gray-500 dark:text-[#A395DA]">{timeAgo}</span>
+            {onReport && (
+              <div className="relative">
+                <button
+                  onClick={(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }}
+                  className="text-gray-400 dark:text-gray-600 hover:text-[#492775] dark:hover:text-[#A395DA] transition-colors"
+                >
+                  <MoreHorizontal size={15} strokeWidth={2} />
+                </button>
+                {isMenuOpen && (
+                  <div className="absolute right-0 top-5 bg-white dark:bg-[#1A1A2E] border border-gray-100 dark:border-gray-700 rounded-2xl shadow-lg z-20 overflow-hidden min-w-[130px]">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setIsMenuOpen(false); onReport(); }}
+                      className="w-full flex items-center gap-2 px-4 py-3 text-[13px] text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                    >
+                      <Flag size={13} strokeWidth={2} />
+                      Signaler
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
         {content && (
           <p className="text-[#492775] dark:text-[#D0C9E8] text-[13px] leading-snug mb-3">
@@ -37,7 +61,7 @@ export default function CommentCard({ id, author, timeAgo, content, likes, avata
         )}
         <div className="flex items-center gap-4">
           <PostAction icon={Heart} count={likes} filled={isLiked} onClick={() => { setIsLiked(!isLiked); onLike?.(); }} />
-          <button 
+          <button
             onClick={() => onReply && onReply(author)}
             className="flex items-center gap-1 group cursor-pointer text-[#A395DA] dark:text-[#8B7BB5] hover:text-[#492775] dark:hover:text-[#D0C9E8] transition-colors duration-300"
           >
