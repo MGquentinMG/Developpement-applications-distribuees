@@ -73,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     age: number;
   }) => {
     await api.post("/api/auth/register", payload);
-    router.push("/login");
+    router.push("/");
   };
 
   const logout = () => {

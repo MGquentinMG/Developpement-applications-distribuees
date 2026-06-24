@@ -1,47 +1,46 @@
-vault status | grep "Initialized" | grep "true"
-if [ $? -ne 0 ]; then
-    vault operator init ...
-else
-    echo "Vault already initialized, skipping init"
-fi
+#!/bin/sh
 
-INIT_OUTPUT=$(vault operator init -key-shares=1 -key-threshold=1 -format=json)
-echo "$INIT_OUTPUT" > /vault/init_output.json
+export VAULT_ADDR="${VAULT_ADDR:-http://vault:8200}"
+export VAULT_TOKEN="${VAULT_TOKEN:-breezy_dev_root}"
 
-UNSEAL_KEY=$(echo "$INIT_OUTPUT" | awk -F'"' '/"unseal_keys_b64"/{getline; print $2}')
-ROOT_TOKEN=$(echo "$INIT_OUTPUT" | awk -F'"' '/"root_token"/{print $4}')
+echo "==> VAULT_ADDR=$VAULT_ADDR"
+echo "==> Attente de Vault (max 60s)..."
+i=1
+while [ $i -le 30 ]; do
+  vault status 2>/dev/null && break
+  echo "  [${i}/30] pas encore pret, retry dans 2s..."
+  sleep 2
+  i=$((i + 1))
+done
 
-echo "DEBUG UNSEAL_KEY: $UNSEAL_KEY"
-echo "DEBUG ROOT_TOKEN: $ROOT_TOKEN"
+vault status || { echo "==> ERREUR: Vault inaccessible apres 60s"; exit 1; }
 
-vault operator unseal "$UNSEAL_KEY"
-export VAULT_TOKEN="$ROOT_TOKEN"
+echo "==> Activation approle..."
+vault auth enable approle 2>&1 || echo "  (deja actif)"
 
-echo "UNSEAL_KEY=$UNSEAL_KEY" > /vault/keys.env
-echo "ROOT_TOKEN=$ROOT_TOKEN" >> /vault/keys.env
+echo "==> Activation transit..."
+vault secrets enable transit 2>&1 || echo "  (deja actif)"
 
-vault auth enable approle
-vault secrets enable transit
-vault secrets enable -path=secret kv-v2
+echo "==> Activation kv-v2..."
+vault secrets enable -path=secret kv-v2 2>&1 || echo "  (deja actif)"
 
-vault write -f transit/keys/jwt-key type=ecdsa-p256
+echo "==> Creation de la cle transit JWT..."
+vault write -f transit/keys/jwt-key type=ecdsa-p256 2>&1 || echo "  (deja existant)"
 
-vault policy write breezy-policy - <<EOF
-path "transit/sign/jwt-key"   { capabilities = ["create","update"] }
-path "transit/verify/jwt-key" { capabilities = ["create","update"] }
-path "transit/keys/jwt-key"   { capabilities = ["read"] }
-path "secret/data/breezy/*"   { capabilities = ["read"] }
-EOF
+echo "==> Ecriture de la policy..."
+printf 'path "transit/sign/jwt-key"   { capabilities = ["create","update"] }\npath "transit/verify/jwt-key" { capabilities = ["create","update"] }\npath "transit/keys/jwt-key"   { capabilities = ["read"] }\npath "secret/data/breezy/*"   { capabilities = ["read"] }\n' > /tmp/policy.hcl
+vault policy write breezy-policy /tmp/policy.hcl
 
+echo "==> Creation du role AppRole..."
 vault write auth/approle/role/breezy-app \
   token_policies="breezy-policy" \
   token_ttl=1h \
   token_max_ttl=4h
 
+echo "==> Recuperation des credentials..."
 ROLE_ID=$(vault read -field=role_id auth/approle/role/breezy-app/role-id)
 SECRET_ID=$(vault write -f -field=secret_id auth/approle/role/breezy-app/secret-id)
 
-echo "APP_VAULT_ROLE_ID=$ROLE_ID" >> /vault/keys.env
-echo "APP_VAULT_SECRET_ID=$SECRET_ID" >> /vault/keys.env
+printf 'APP_VAULT_ROLE_ID=%s\nAPP_VAULT_SECRET_ID=%s\n' "$ROLE_ID" "$SECRET_ID" > /vault/keys.env
 
-echo "==> Init termine. Credentials dans /vault/keys.env"
+echo "==> Done. ROLE_ID=$ROLE_ID"

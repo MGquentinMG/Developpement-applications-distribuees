@@ -3,7 +3,6 @@
 import React, { useState, FormEvent, ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 import "../../i18n";
-import { InputField } from "../LoginCard/common/InputField";
 import { api } from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -83,11 +82,12 @@ export function ReportForm() {
             <label className="block text-sm text-gray-900 dark:text-[#F9F9FB] mb-2">
               {t("report.descriptionLabel", "Description :")}
             </label>
-            <InputField
+            <input
               type="text"
               placeholder="..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              className="bg-[#F3F4F6] dark:bg-[#2A2A40] text-gray-900 dark:text-[#F9F9FB] text-sm rounded-lg p-3 w-full outline-none transition-colors"
             />
           </div>
 

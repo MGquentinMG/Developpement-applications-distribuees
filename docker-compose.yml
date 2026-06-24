@@ -1,19 +1,126 @@
 services:
+
+  vault:
+    image: hashicorp/vault:1.17
+    container_name: vault
+    restart: unless-stopped
+    cap_add:
+      - IPC_LOCK
+    # Dev mode : auto-initialisé, auto-unsealed, root token connu
+    command: vault server -dev -dev-root-token-id=breezy_dev_root -dev-listen-address=0.0.0.0:8200
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: breezy_dev_root
+      VAULT_ADDR: "http://127.0.0.1:8200"
+    ports:
+      - "8200:8200"
+    networks:
+      - secrets
+    healthcheck:
+      test: ["CMD", "sh", "-c", "wget -q -O- http://127.0.0.1:8200/v1/sys/health"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+      start_period: 3s
+
+  vault-init:
+    image: hashicorp/vault:1.17
+    container_name: vault-init
+    restart: "no"
+    environment:
+      VAULT_ADDR: "http://vault:8200"
+      VAULT_TOKEN: breezy_dev_root
+    volumes:
+      - ./backend/vault:/vault:rw
+    networks:
+      - secrets
+    depends_on:
+      vault:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c", "tr -d '\\r' < /vault/init.sh > /tmp/init.sh && sh /tmp/init.sh"]
+
   mongo-secure:
     image: mongo:7
     container_name: mongo-secure
     restart: unless-stopped
-    ports:
-      - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: breezy_app
-      MONGO_INITDB_ROOT_PASSWORD: breezypass
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: supersecretpassword123
       MONGO_INITDB_DATABASE: ma_db
     volumes:
       - mongo_data:/data/db
+    networks:
+      - data
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 3s
+
+  breezy_app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: breezy_app
+    restart: unless-stopped
+    env_file: ./backend/.env
+    environment:
+      VAULT_ADDR: "http://vault:8200"
+    volumes:
+      - ./backend/vault:/vault:ro
+      - ./backend/uploads:/app/uploads
+    expose:
+      - "5000"
+    networks:
+      - app
+      - data
+      - secrets
+    depends_on:
+      mongo-secure:
+        condition: service_healthy
+      vault-init:
+        condition: service_completed_successfully
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost
+    container_name: frontend
+    restart: unless-stopped
+    expose:
+      - "3000"
+    networks:
+      - frontend
+    depends_on:
+      breezy_app:
+        condition: service_started
+
+  nginx:
+    image: owasp/modsecurity-crs:nginx-alpine
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./backend/nginx/nginx.conf:/etc/nginx/conf.d/breezy.conf
+    networks:
+      - frontend
+      - app
+    depends_on:
+      - breezy_app
+      - frontend
+
+networks:
+  frontend:
+    driver: bridge
+  app:
+    driver: bridge
+  data:
+    driver: bridge
+  secrets:
+    driver: bridge
 
 volumes:
   mongo_data:
-
-
-
