@@ -66,6 +66,7 @@ services:
       VAULT_ADDR: http://vault:8200
       VAULT_TOKEN: breezy_dev_root
       JWT_SECRET: breezy_dev_fallback_change_in_prod
+      ADMIN_PASSWORD: "Admin1234!"
     volumes:
       - ./backend/vault:/vault:ro
       - ./backend/uploads:/app/uploads

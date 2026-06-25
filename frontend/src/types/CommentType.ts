@@ -10,4 +10,6 @@ export interface CommentProps {
   onLike?: () => void;
   onReply?: (author: string) => void;
   onReport?: () => void;
+  onEdit?: (newContent: string) => Promise<void> | void;
+  onDelete?: () => Promise<void> | void;
 }

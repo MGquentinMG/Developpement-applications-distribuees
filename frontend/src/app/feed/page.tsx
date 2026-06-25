@@ -97,6 +97,22 @@ export default function FeedPage() {
     } catch {}
   };
 
+  const handleEditPost = async (id: string, newContent: string) => {
+    try {
+      await api.patch(`/api/posts/${id}`, { content: newContent });
+      setPosts((prev) =>
+        prev.map((p) => (p._id === id ? { ...p, content: newContent } : p))
+      );
+    } catch {}
+  };
+
+  const handleDeletePost = async (id: string) => {
+    try {
+      await api.delete(`/api/posts/${id}`);
+      setPosts((prev) => prev.filter((p) => p._id !== id));
+    } catch {}
+  };
+
   return (
     <div className="w-full max-w-[1400px] mx-auto flex flex-col md:flex-row min-h-screen bg-white dark:bg-[#121212] transition-colors duration-300">
 
@@ -150,7 +166,7 @@ export default function FeedPage() {
             <h1 className="text-xl font-bold text-[#1E1E40] dark:text-[#F9F9FB]">Accueil</h1>
           </div>
 
-          <div className="flex px-5 mt-1">
+          <div className="flex px-5 mt-1 lg:gap-8">
             <button
               onClick={() => setActiveTab("all")}
               className={`flex-1 py-3 text-[15px] font-bold transition-all border-b-[3px] -mb-[1px] ${
@@ -198,6 +214,8 @@ export default function FeedPage() {
                 isLiked={user ? post.likes.includes(user._id) : false}
                 onLike={user ? () => handleLike(post._id) : undefined}
                 onRequireAuth={!user ? () => router.push("/login") : undefined}
+                onEdit={user && user._id === post.author._id ? (newContent) => handleEditPost(post._id, newContent) : undefined}
+                onDelete={user && user._id === post.author._id ? () => handleDeletePost(post._id) : undefined}
               />
             ))}
 
