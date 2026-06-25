@@ -45,7 +45,8 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 export function AdminReports() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language === "fr" ? "fr-FR" : "en-US";
   const [reports, setReports] = useState<ApiReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
@@ -136,7 +137,7 @@ export function AdminReports() {
                 </span>
               </div>
               <span className="text-[11px] text-gray-400 shrink-0">
-                {new Date(report.createdAt).toLocaleString("fr-FR")}
+                {new Date(report.createdAt).toLocaleString(locale)}
               </span>
             </div>
 
@@ -198,8 +199,8 @@ export function AdminReports() {
                     onClick={() => openAction({
                       type: "ignore",
                       reportId: report._id,
-                      title: t("admin.ignore", "Ne rien faire"),
-                      description: "Le signalement sera marqué comme résolu sans aucune action sur le contenu.",
+                      title: t("admin.ignore"),
+                      description: t("admin.descIgnore"),
                     })}
                     className="px-3 py-1.5 rounded-xl text-[12px] font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 transition-colors"
                   >
@@ -213,8 +214,8 @@ export function AdminReports() {
                           type: "deletePost",
                           reportId: report._id,
                           postId: report.reportedPost!._id,
-                          title: t("admin.deletePostBtn", "Supprimer le post"),
-                          description: "Le post sera définitivement supprimé. Le compte de l'auteur ne sera pas affecté.",
+                          title: t("admin.deletePostBtn"),
+                          description: t("admin.descDeletePost"),
                         })}
                         className="px-3 py-1.5 rounded-xl text-[12px] font-semibold bg-orange-50 text-orange-600 hover:bg-orange-100 dark:bg-orange-900/20 dark:text-orange-400 transition-colors"
                       >
@@ -228,8 +229,8 @@ export function AdminReports() {
                             reportId: report._id,
                             postId: report.reportedPost!._id,
                             userId: report.reportedPost!.author?._id ?? report.reportedUser?._id,
-                            title: t("admin.banAndDelete", "Bannir + supprimer le post"),
-                            description: "Le post sera supprimé et l'auteur sera banni définitivement.",
+                            title: t("admin.banAndDelete"),
+                            description: t("admin.descBanAndDelete"),
                           })}
                           className="px-3 py-1.5 rounded-xl text-[12px] font-semibold bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 transition-colors"
                         >
@@ -246,8 +247,8 @@ export function AdminReports() {
                           type: "deleteComment",
                           reportId: report._id,
                           commentId: report.reportedComment!._id,
-                          title: t("admin.deleteCommentBtn", "Supprimer le commentaire"),
-                          description: "Le commentaire sera définitivement supprimé. Le compte de l'auteur ne sera pas affecté.",
+                          title: t("admin.deleteCommentBtn"),
+                          description: t("admin.descDeleteComment"),
                         })}
                         className="px-3 py-1.5 rounded-xl text-[12px] font-semibold bg-orange-50 text-orange-600 hover:bg-orange-100 dark:bg-orange-900/20 dark:text-orange-400 transition-colors"
                       >
@@ -261,8 +262,8 @@ export function AdminReports() {
                             reportId: report._id,
                             commentId: report.reportedComment!._id,
                             userId: report.reportedComment!.author?._id ?? report.reportedUser?._id,
-                            title: t("admin.banAndDelete", "Bannir + supprimer"),
-                            description: "Le commentaire sera supprimé et l'auteur sera banni définitivement.",
+                            title: t("admin.banAndDelete"),
+                            description: t("admin.descBanAndDeleteComment"),
                           })}
                           className="px-3 py-1.5 rounded-xl text-[12px] font-semibold bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 transition-colors"
                         >

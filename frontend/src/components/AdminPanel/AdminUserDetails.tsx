@@ -36,7 +36,7 @@ export function AdminUserDetails({ user, posts, onDeleteUser, onDeletePost, onBa
               <h2 className="text-xl font-bold text-[#1A1A2E] dark:text-[#F9F9FB]">{user.pseudo}</h2>
               {user.banned && (
                 <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 uppercase tracking-wide">
-                  Banni
+                  {t("admin.banned")}
                 </span>
               )}
             </div>
@@ -52,7 +52,7 @@ export function AdminUserDetails({ user, posts, onDeleteUser, onDeletePost, onBa
               className="flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 dark:bg-green-900/20 dark:border-green-800 dark:text-green-400 transition-colors"
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              Débannir
+              {t("admin.unban")}
             </button>
           ) : (
             <button
@@ -60,7 +60,7 @@ export function AdminUserDetails({ user, posts, onDeleteUser, onDeletePost, onBa
               className="flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-100 dark:bg-orange-900/20 dark:border-orange-800 dark:text-orange-400 transition-colors"
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-              Bannir
+              {t("admin.ban")}
             </button>
           )}
           <button
@@ -68,7 +68,7 @@ export function AdminUserDetails({ user, posts, onDeleteUser, onDeletePost, onBa
             className="flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400 transition-colors"
           >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-            Supprimer le compte
+            {t("admin.deleteAccount")}
           </button>
         </div>
       </div>

@@ -25,15 +25,15 @@ describe("ReportForm", () => {
   });
 
   it("doit afficher le formulaire par défaut avec le bouton de soumission", () => {
-    render(<ReportForm />);
-    
+    render(<ReportForm postId="test-id" />);
+
     // Le test va chercher les textes que nous avons définis dans le mock ci-dessus
     expect(screen.getByText("Signalement")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Signaler" })).toBeInTheDocument();
   });
 
   it("doit afficher le message de succès après la soumission", () => {
-    render(<ReportForm />);
+    render(<ReportForm postId="test-id" />);
     
     // Sélection d'un motif dans le menu déroulant
     const select = screen.getByRole("combobox");

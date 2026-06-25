@@ -9,6 +9,7 @@ import Avatar from "../../components/Avatar/Avatar";
 import AccordionItem from "../../components/AccordionItem/AccordionItem";
 import BackButton from "../../components/BackButton/BackButton";
 import Toggle from "../../components/Toggle/Toggle";
+import EditProfileModal from "../../components/EditProfileModal/EditProfileModal";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -17,6 +18,7 @@ export default function SettingsPage() {
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
   
+  const [editProfileOpen, setEditProfileOpen] = useState(false);
   const [notifLikes, setNotifLikes] = useState(true);
   const [notifComments, setNotifComments] = useState(true);
   const [notifShares, setNotifShares] = useState(false);
@@ -38,7 +40,10 @@ export default function SettingsPage() {
         </div>
         <div className="flex flex-col">
           <span className="text-[#1E1E40] dark:text-[#F9F9FB] text-[19px] font-bold">@{user?.username ?? "..."}</span>
-          <button className="flex items-center text-[#8B7BB5] dark:text-[#A395DA] text-sm mt-0.5 hover:underline cursor-pointer border-none bg-transparent">
+          <button
+            onClick={() => setEditProfileOpen(true)}
+            className="flex items-center text-[#8B7BB5] dark:text-[#A395DA] text-sm mt-0.5 hover:underline cursor-pointer border-none bg-transparent"
+          >
             {t("settings.editProfile")} <ChevronRight size={16} className="ml-1" />
           </button>
         </div>
@@ -120,6 +125,7 @@ export default function SettingsPage() {
           {t("settings.legalNotice")}
         </Link>
       </div>
+      <EditProfileModal isOpen={editProfileOpen} onClose={() => setEditProfileOpen(false)} />
     </main>
   );
 }

@@ -14,12 +14,6 @@ module.exports = async function (fastify, opts) {
       summary: "Uploader une image (jpg, jpeg, png, gif, webp — max 5 Mo)",
       security: [{ bearerAuth: [] }],
       consumes: ["multipart/form-data"],
-      body: {
-        type: "object",
-        properties: {
-          file: { type: "string", format: "binary", description: "Fichier image" },
-        },
-      },
       response: {
         201: {
           type: "object",

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface AdminConfirmModalProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface AdminConfirmModalProps {
 }
 
 export function AdminConfirmModal({ isOpen, title, description, onConfirm, onCancel }: AdminConfirmModalProps) {
+  const { t } = useTranslation();
   const [reason, setReason] = useState("");
 
   if (!isOpen) return null;
@@ -44,13 +46,13 @@ export function AdminConfirmModal({ isOpen, title, description, onConfirm, onCan
 
         <div className="mb-5">
           <label className="block text-[12px] font-semibold text-[#492775] dark:text-[#A395DA] mb-2">
-            Justificatif <span className="text-red-500">*</span>
+            {t("admin.confirmReasonLabel")} <span className="text-red-500">*</span>
           </label>
           <textarea
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             rows={4}
-            placeholder="Expliquez la raison de cette action..."
+            placeholder={t("admin.confirmReasonPlaceholder")}
             className="w-full bg-[#F4F2F9] dark:bg-[#2A2438] text-[#1E1E40] dark:text-[#F9F9FB] rounded-2xl px-4 py-3 text-[13px] outline-none resize-none placeholder-gray-400 dark:placeholder-gray-600 transition-colors"
           />
         </div>
@@ -60,14 +62,14 @@ export function AdminConfirmModal({ isOpen, title, description, onConfirm, onCan
             onClick={handleCancel}
             className="flex-1 py-2.5 rounded-full text-[13px] font-semibold bg-[#F4F2F9] dark:bg-[#2A2A40] text-[#5A4B81] dark:text-[#D0C9E8] hover:bg-[#e4dff0] dark:hover:bg-[#3A3A55] transition-colors"
           >
-            Annuler
+            {t("admin.cancel")}
           </button>
           <button
             onClick={handleConfirm}
             disabled={!reason.trim()}
             className="flex-1 py-2.5 rounded-full text-[13px] font-semibold bg-red-500 text-white hover:bg-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
-            Confirmer
+            {t("admin.confirm")}
           </button>
         </div>
       </div>
