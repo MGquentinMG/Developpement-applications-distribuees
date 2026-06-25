@@ -12,4 +12,6 @@ export interface PostCardProps {
   onRequireAuth?: () => void;
   onCommentClick?: () => void;
   onLike?: () => void;
+  onEdit?: (newContent: string) => Promise<void> | void;
+  onDelete?: () => Promise<void> | void;
 }

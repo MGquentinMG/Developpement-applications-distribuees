@@ -90,6 +90,48 @@ module.exports = async function (fastify, opts) {
     }
   });
 
+  fastify.patch("/me/password", {
+    onRequest: [fastify.authenticate],
+    schema: {
+      tags: ["Users"],
+      summary: "Changer son mot de passe (obligatoire à la première connexion)",
+      security: [{ bearerAuth: [] }],
+      body: {
+        type: "object",
+        required: ["newPassword"],
+        properties: {
+          currentPassword: { type: "string", description: "Mot de passe actuel (ignoré si mustChangePassword)" },
+          newPassword: { type: "string", minLength: 6 },
+        },
+      },
+      response: {
+        200: { ...S.success, description: "Mot de passe mis à jour" },
+        400: { ...S.error, description: "Nouveau mot de passe trop court ou identique" },
+        401: { ...S.error, description: "Mot de passe actuel incorrect" },
+      },
+    },
+  }, async (req, reply) => {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      if (!newPassword || newPassword.length < 6) {
+        return errorResponse(reply, "Le mot de passe doit contenir au moins 6 caractères", 400);
+      }
+      const user = await User.findById(req.user.id);
+      // Si mustChangePassword est false, on vérifie l'ancien mot de passe
+      if (!user.mustChangePassword) {
+        if (!currentPassword) return errorResponse(reply, "Mot de passe actuel requis", 400);
+        const valid = await bcrypt.compare(currentPassword, user.password);
+        if (!valid) return errorResponse(reply, "Mot de passe actuel incorrect", 401);
+      }
+      user.password = await bcrypt.hash(newPassword, 10);
+      user.mustChangePassword = false;
+      await user.save();
+      return successResponse(reply, null, "Mot de passe mis à jour");
+    } catch (err) {
+      return errorResponse(reply, "Erreur", 500);
+    }
+  });
+
   fastify.patch("/me", {
     onRequest: [fastify.authenticate],
     schema: {

@@ -1,11 +1,13 @@
 require("dotenv").config();
 
-const app = require("./app");
-const connectDB = require("./config/database");
+const app        = require("./app");
+const connectDB  = require("./config/database");
+const seedAdmin  = require("./seed");
 
 const start = async () => {
   try {
     await connectDB();
+    await seedAdmin();
 
     await app.listen({
       port: process.env.PORT || 5000,
