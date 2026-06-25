@@ -96,6 +96,23 @@ export default function PostDetailsPage() {
     setCommentImagePreview(null);
   };
 
+  const handleLikePost = async () => {
+    if (!user || !post) return;
+    try {
+      await api.post(`/api/posts/${post._id}/like`, {});
+      setPost((prev) => {
+        if (!prev) return prev;
+        const alreadyLiked = prev.likes.includes(user._id);
+        return {
+          ...prev,
+          likes: alreadyLiked
+            ? prev.likes.filter((id) => id !== user._id)
+            : [...prev.likes, user._id],
+        };
+      });
+    } catch {}
+  };
+
   const handleLikeComment = async (commentId: string) => {
     if (!user) return;
     try {
@@ -177,6 +194,8 @@ export default function PostDetailsPage() {
                 comments={formatCount(post.comments.length)}
                 shares="0"
                 avatarUrl={post.author?.avatar}
+                isLiked={user ? post.likes.includes(user._id) : false}
+                onLike={handleLikePost}
                 onCommentClick={focusInput}
               />
             </div>
@@ -203,6 +222,7 @@ export default function PostDetailsPage() {
                   isLiked={user ? (comment.likes ?? []).includes(user._id) : false}
                   onLike={() => handleLikeComment(comment._id)}
                   onReply={handleReply}
+                  onReport={() => setReportingCommentId(comment._id)}
                 />
               ))}
             </div>
@@ -218,6 +238,12 @@ export default function PostDetailsPage() {
           onRemoveImage={handleRemoveCommentImage}
           placeholder={user ? "Ajouter un commentaire..." : "Connecte-toi pour commenter"}
           disabled={!user || sending}
+        />
+
+        <ReportModal
+          isOpen={!!reportingCommentId}
+          commentId={reportingCommentId ?? undefined}
+          onClose={() => setReportingCommentId(null)}
         />
       </main>
       

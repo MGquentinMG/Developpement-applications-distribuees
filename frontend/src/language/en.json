@@ -191,7 +191,20 @@
     "reasonOther": "Other",
     "registrationSent": "Request sent!",
     "registrationSentDesc": "Your account is pending validation by an administrator. You will receive access once it is approved.",
-    "close": "Close"
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "confirmReasonLabel": "Justification",
+    "confirmReasonPlaceholder": "Explain the reason for this action...",
+    "descIgnore": "The report will be marked as resolved without any action on the content.",
+    "descDeletePost": "The post will be permanently deleted. The author's account will not be affected.",
+    "descBanAndDelete": "The post will be deleted and the author will be permanently banned.",
+    "descDeleteComment": "The comment will be permanently deleted. The author's account will not be affected.",
+    "descBanAndDeleteComment": "The comment will be deleted and the author will be permanently banned.",
+    "descDeleteUser": "This action is irreversible. The account and all associated posts will be permanently deleted.",
+    "descDeletePostSingle": "This post will be permanently deleted.",
+    "descBanUser": "The user will no longer be able to access their account. You can unban them at any time.",
+    "deleteLabelUser": "Delete account of"
   },
   "report": {
     "title": "Report",

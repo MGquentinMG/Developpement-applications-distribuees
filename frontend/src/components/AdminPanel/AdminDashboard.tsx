@@ -31,7 +31,8 @@ interface PendingAction {
 }
 
 export function AdminDashboard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language === "fr" ? "fr-FR" : "en-US";
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
@@ -48,7 +49,7 @@ export function AdminDashboard() {
           id: u._id,
           pseudo: u.username,
           email: u.email,
-          createdAt: new Date(u.createdAt).toLocaleDateString("fr-FR"),
+          createdAt: new Date(u.createdAt).toLocaleDateString(locale),
           avatar: u.avatar,
           banned: u.banned ?? false,
         })));
@@ -67,23 +68,23 @@ export function AdminDashboard() {
         id: p._id,
         content: p.content,
         image: p.image,
-        createdAt: new Date(p.createdAt).toLocaleString("fr-FR"),
+        createdAt: new Date(p.createdAt).toLocaleString(locale),
       })));
     } catch {}
   };
 
   const handleDeleteUser = (userId: string) => {
     const user = users.find((u) => u.id === userId);
-    setPendingAction({ type: "deleteUser", id: userId, label: `Supprimer le compte de ${user?.pseudo ?? userId}` });
+    setPendingAction({ type: "deleteUser", id: userId, label: `${t("admin.deleteLabelUser")} ${user?.pseudo ?? userId}` });
   };
 
   const handleDeletePost = (postId: string) => {
-    setPendingAction({ type: "deletePost", id: postId, label: "Supprimer ce post" });
+    setPendingAction({ type: "deletePost", id: postId, label: t("admin.deletePostBtn") });
   };
 
   const handleBanUser = (userId: string) => {
     const user = users.find((u) => u.id === userId);
-    setPendingAction({ type: "banUser", id: userId, label: `Bannir ${user?.pseudo ?? userId}` });
+    setPendingAction({ type: "banUser", id: userId, label: `${t("admin.ban")} ${user?.pseudo ?? userId}` });
   };
 
   const handleUnbanUser = async (userId: string) => {
@@ -119,13 +120,13 @@ export function AdminDashboard() {
   );
 
   if (loading) {
-    return <p className="text-center text-gray-400 mt-10 text-sm">Chargement...</p>;
+    return <p className="text-center text-gray-400 mt-10 text-sm">{t("admin.loading")}</p>;
   }
 
   const modalDescriptions: Record<string, string> = {
-    deleteUser: "Cette action est irréversible. Le compte et tous les posts associés seront définitivement supprimés.",
-    deletePost: "Ce post sera définitivement supprimé.",
-    banUser: "L'utilisateur ne pourra plus accéder à son compte. Vous pouvez le débannir à tout moment.",
+    deleteUser: t("admin.descDeleteUser"),
+    deletePost: t("admin.descDeletePostSingle"),
+    banUser: t("admin.descBanUser"),
   };
 
   return (
