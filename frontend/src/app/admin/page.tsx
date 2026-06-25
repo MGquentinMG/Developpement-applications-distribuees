@@ -5,6 +5,9 @@ import { AdminReports } from "../../components/AdminPanel/AdminReports";
 import Navbar from "../../components/Navbar/Navbar";
 type Tab = "users" | "reports";
 export default function AdminPage() {
+  const { t } = useTranslation();
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>("users");
   return (
     <div className="w-full max-w-[1400px] mx-auto flex flex-col md:flex-row min-h-screen bg-gray-50 dark:bg-[#121212] transition-colors duration-300">

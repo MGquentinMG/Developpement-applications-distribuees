@@ -3,7 +3,34 @@ const Fastify = require("fastify");
 
 const app = Fastify({ logger: true });
 
-// 1. Plugins de base
+// 1. Swagger (avant les routes)
+app.register(require("@fastify/swagger"), {
+  openapi: {
+    info: {
+      title: "Breezy API",
+      description: "API REST du réseau social Breezy — JWT requis via Authorization: Bearer <token>",
+      version: "1.0.0",
+    },
+    servers: [{ url: "http://localhost/api", description: "Via nginx (port 80)" }],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+  },
+});
+
+app.register(require("@fastify/swagger-ui"), {
+  routePrefix: "/docs",
+  uiConfig: { docExpansion: "list", deepLinking: true },
+  staticCSP: true,
+});
+
+// 2. Plugins de base
 app.register(require("@fastify/cors"), {
   origin: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -17,10 +44,8 @@ app.register(require("@fastify/static"), {
   prefix: "/uploads/",
 });
 
-// 2. JWT via Vault
+// 3. JWT via Vault
 app.register(require("./plugins/jwt_plugin"));
-
-// 3. Authenticate est décoré dans jwt_plugin, supprimer le doublon ici
 
 // 4. Routes
 app.register(require("./routes/auth.routes"), { prefix: "/api/auth" });

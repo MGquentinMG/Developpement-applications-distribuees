@@ -7,6 +7,7 @@ import "../../../i18n";
 import BackButton from "../../../components/BackButton/BackButton";
 import PostCard from "../../../components/PostCard/PostCard";
 import CommentCard from "../../../components/CommentCard/CommentCard";
+import ReportModal from "../../../components/ReportModal/ReportModal";
 import MessageInput from "../../../components/MessageInput/MessageInput";
 import Navbar from "../../../components/Navbar/Navbar";
 import { api, timeAgo, formatCount } from "../../../services/api";
@@ -45,6 +46,7 @@ export default function PostDetailsPage() {
   const [commentImagePreview, setCommentImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [reportingCommentId, setReportingCommentId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!postId) return;

@@ -28,6 +28,7 @@ export function RegisterForm({ onSwitchMode, onClose }: AuthFormProps) {
   const { register } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [registered, setRegistered] = useState(false);
 
   const [step, setStep] = useState<1 | 2>(1);
   const [pseudo, setPseudo] = useState("");
@@ -63,7 +64,7 @@ export function RegisterForm({ onSwitchMode, onClose }: AuthFormProps) {
     setError(null);
     try {
       await register({ username: pseudo, email, password, age: calculatedAge });
-      onClose();
+      setRegistered(true);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Erreur lors de l'inscription");
     } finally {
@@ -72,6 +73,28 @@ export function RegisterForm({ onSwitchMode, onClose }: AuthFormProps) {
   };
 
   const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
+
+  if (registered) {
+    return (
+      <div className="bg-white dark:bg-[#1A1A2E] rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.5)] w-full max-w-[400px] p-8 pt-10 relative transition-colors duration-300">
+        <button onClick={onClose} className="absolute top-4 right-4 bg-gray-200 dark:bg-[#2A2438] hover:bg-gray-300 dark:hover:bg-[#3A304D] rounded-full w-7 h-7 flex items-center justify-center text-gray-600 dark:text-gray-300 transition-colors cursor-pointer border-none">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <div className="flex flex-col items-center text-center py-6 gap-4">
+          <div className="w-16 h-16 rounded-full bg-[#F5F0FF] dark:bg-[#2A2438] flex items-center justify-center">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#492775" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <h2 className="text-[22px] font-bold text-[#1E1E40] dark:text-[#F9F9FB]">{t("admin.registrationSent", "Demande envoyée !")}</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed max-w-[280px]">
+            {t("admin.registrationSentDesc", "Ton compte est en attente de validation par un administrateur. Tu recevras l'accès dès qu'il sera approuvé.")}
+          </p>
+          <button onClick={onClose} className="mt-2 bg-[#492775] dark:bg-[#A395DA] text-white font-semibold rounded-full text-sm px-8 py-2.5 hover:bg-[#3a1f5d] transition-colors cursor-pointer border-none">
+            {t("admin.close", "Fermer")}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white dark:bg-[#1A1A2E] rounded-3xl shadow-xl w-full max-w-[500px] p-10 pt-12 relative transition-colors duration-300">

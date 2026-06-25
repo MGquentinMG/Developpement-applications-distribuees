@@ -70,7 +70,7 @@ export const api = {
     });
     const json = await res.json() as { data?: { url: string }; success?: boolean };
     if (!res.ok || !json.data?.url) throw new Error("Échec de l'upload");
-    return `${API_URL}${json.data.url}`;
+    return json.data.url;
   },
 };
 

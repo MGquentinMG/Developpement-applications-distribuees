@@ -7,6 +7,11 @@ const ReportSchema = new mongoose.Schema(
       ref: "Post"
     },
 
+    reportedComment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment"
+    },
+
     reportedUser: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User"

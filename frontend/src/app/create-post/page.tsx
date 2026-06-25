@@ -43,7 +43,7 @@ export default function CreatePostPage() {
         tags: extractTags(content),
         ...(imageUrl ? { image: imageUrl } : {}),
       });
-      router.back();
+      router.push("/feed");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Erreur lors de la publication");
     } finally {
