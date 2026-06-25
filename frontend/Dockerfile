@@ -1,0 +1,17 @@
+FROM node:20-alpine
+
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+WORKDIR /app
+
+COPY --chown=appuser:appgroup package*.json ./
+RUN npm install
+
+COPY --chown=appuser:appgroup . .
+RUN npm run build
+
+USER appuser
+
+EXPOSE 3000
+
+CMD ["npm", "start"]

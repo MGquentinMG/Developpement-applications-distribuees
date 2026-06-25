@@ -1,0 +1,112 @@
+services:
+
+  vault:
+    image: hashicorp/vault:1.17
+    container_name: vault
+    user: "0:0"
+    restart: unless-stopped
+    cap_add:
+      - IPC_LOCK
+    command: vault server -config=/vault/config/config.hcl
+    environment:
+      VAULT_ADDR: "http://127.0.0.1:8200"
+    ports:
+      - "8200:8200"
+    volumes:
+      - ./vault/data:/vault/data          # bind mount au lieu du volume nommé
+      - ./vault/config.hcl:/vault/config/config.hcl:ro
+    networks:
+      - secrets
+    healthcheck:
+      test: ["CMD", "sh", "-c", "wget -q -O- 'http://127.0.0.1:8200/v1/sys/health?uninitcode=200&sealedcode=200'"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+      start_period: 5s
+
+  vault-init:
+    image: hashicorp/vault:1.17
+    container_name: vault-init
+    restart: "no"
+    environment:
+      VAULT_ADDR: "http://vault:8200"
+      VAULT_TOKEN: ${VAULT_DEV_ROOT_TOKEN}
+    volumes:
+      - ./vault:/vault:rw
+    networks:
+      - secrets
+    depends_on:
+      vault:
+        condition: service_healthy
+    entrypoint: ["sh", "/vault/init.sh"]
+
+  nginx:
+    image: owasp/modsecurity-crs:nginx-alpine
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/breezy.conf
+    networks:
+      - frontend
+      - app
+    depends_on:
+      - breezy_app
+
+  mongo-secure:
+    image: mongo:7
+    container_name: mongo-secure
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: supersecretpassword123
+      MONGO_INITDB_DATABASE: ma_db
+    volumes:
+      - mongo_data:/data/db
+      - ./database.js:/docker-entrypoint-initdb.d/database.js:ro
+    networks:
+      - data
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 3s
+
+  breezy_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: breezy_app
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      VAULT_ADDR: "http://vault:8200"
+      VAULT_ROLE_ID: ${APP_VAULT_ROLE_ID}       # manquant dans ta version
+      VAULT_SECRET_ID: ${APP_VAULT_SECRET_ID}
+    expose:
+      - "5000"
+    networks:
+      - app
+      - data
+      - secrets
+    depends_on:
+      mongo-secure:
+        condition: service_healthy
+      vault-init:
+        condition: service_completed_successfully
+
+networks:
+  frontend:
+    driver: bridge
+  app:
+    driver: bridge
+  data:
+    driver: bridge
+  secrets:
+    driver: bridge
+
+volumes:
+  mongo_data:
+  vault_data:

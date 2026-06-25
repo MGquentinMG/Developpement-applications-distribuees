@@ -1,0 +1,136 @@
+services:
+
+  vault:
+    image: hashicorp/vault:1.17
+    container_name: vault
+    restart: unless-stopped
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: breezy_dev_root
+      VAULT_ADDR: http://127.0.0.1:8200
+    command: vault server -dev -dev-root-token-id=breezy_dev_root -dev-listen-address=0.0.0.0:8200
+    ports:
+      - "8200:8200"
+    networks:
+      - secrets
+    healthcheck:
+      test: ["CMD", "vault", "status", "-address=http://127.0.0.1:8200"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  vault-init:
+    image: hashicorp/vault:1.17
+    container_name: vault-init
+    entrypoint: ["sh", "/vault/init.sh"]
+    environment:
+      VAULT_TOKEN: breezy_dev_root
+      VAULT_ADDR: http://vault:8200
+    volumes:
+      - ./backend/vault:/vault
+    networks:
+      - secrets
+    depends_on:
+      vault:
+        condition: service_healthy
+    restart: "no"
+
+  mongo-secure:
+    image: mongo:7
+    container_name: mongo-secure
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: supersecretpassword123
+      MONGO_INITDB_DATABASE: ma_db
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - data
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')", "--quiet"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  breezy_app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: breezy_app
+    restart: unless-stopped
+    environment:
+      PORT: "5000"
+      MONGO_URI: mongodb://admin:supersecretpassword123@mongo-secure:27017/ma_db?authSource=admin
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: breezy_dev_root
+      JWT_SECRET: breezy_dev_fallback_change_in_prod
+    volumes:
+      - ./backend/vault:/vault:ro
+      - ./backend/uploads:/app/uploads
+    networks:
+      - app
+      - data
+      - secrets
+    depends_on:
+      mongo-secure:
+        condition: service_healthy
+      vault-init:
+        condition: service_completed_successfully
+
+  nginx:
+    image: owasp/modsecurity-crs:nginx-alpine
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      ANOMALY_INBOUND: "5"
+      ANOMALY_OUTBOUND: "4"
+      BLOCKING_PARANOIA: "1"
+      ALLOWED_METHODS: "GET HEAD POST OPTIONS PUT PATCH DELETE"
+    volumes:
+      - ./backend/nginx/nginx.conf:/etc/nginx/conf.d/breezy.conf
+    networks:
+      - app
+      - frontend
+    depends_on:
+      - breezy_app
+      - frontend
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: unless-stopped
+    networks:
+      - frontend
+
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: mongo-express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: supersecretpassword123
+      ME_CONFIG_MONGODB_URL: mongodb://admin:supersecretpassword123@mongo-secure:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: admin123
+    networks:
+      - data
+    depends_on:
+      mongo-secure:
+        condition: service_healthy
+
+networks:
+  app:
+  data:
+  frontend:
+  secrets:
+
+volumes:
+  mongo_data:
