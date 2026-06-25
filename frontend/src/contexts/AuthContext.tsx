@@ -10,6 +10,7 @@ export interface AuthUser {
   role: string;
   avatar?: string;
   bio?: string;
+  mustChangePassword?: boolean;
   followers: { _id: string; username: string; avatar?: string }[];
   following: { _id: string; username: string; avatar?: string }[];
 }

@@ -60,7 +60,12 @@ const UserSchema = new mongoose.Schema(
 
     banReason: String,
 
-    tags: [String]
+    tags: [String],
+
+    mustChangePassword: {
+      type: Boolean,
+      default: false
+    }
   },
   {
     timestamps: true

@@ -198,6 +198,39 @@ module.exports = async function (fastify, opts) {
     }
   });
 
+  fastify.patch("/:id", {
+    onRequest: [fastify.authenticate],
+    schema: {
+      tags: ["Posts"],
+      summary: "Modifier le contenu de son propre post",
+      security: [{ bearerAuth: [] }],
+      params: S.idParam,
+      body: {
+        type: "object",
+        required: ["content"],
+        properties: { content: { type: "string" } },
+      },
+      response: {
+        200: { ...S.success, description: "Post modifié" },
+        403: { ...S.error, description: "Non autorisé" },
+        404: { ...S.error, description: "Post non trouvé" },
+      },
+    },
+  }, async (req, reply) => {
+    try {
+      const { content } = req.body;
+      if (!content?.trim()) return errorResponse(reply, "Contenu requis", 400);
+      const post = await Post.findById(req.params.id);
+      if (!post) return errorResponse(reply, "Post non trouvé", 404);
+      if (post.author.toString() !== req.user.id) return errorResponse(reply, "Non autorisé", 403);
+      post.content = content.trim();
+      await post.save();
+      return successResponse(reply, post, "Post modifié");
+    } catch (err) {
+      return errorResponse(reply, "Erreur", 500);
+    }
+  });
+
   fastify.delete("/:id", {
     onRequest: [fastify.authenticate],
     schema: {

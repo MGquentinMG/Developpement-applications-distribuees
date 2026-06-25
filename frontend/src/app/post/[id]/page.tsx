@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import "../../../i18n";
 import BackButton from "../../../components/BackButton/BackButton";
@@ -36,6 +36,7 @@ interface ApiPost {
 export default function PostDetailsPage() {
   const { t } = useTranslation();
   const params = useParams();
+  const router = useRouter();
   const postId = params?.id as string;
   const { user } = useAuth();
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
@@ -136,6 +137,44 @@ export default function PostDetailsPage() {
     } catch {}
   };
 
+  const handleEditPost = async (newContent: string) => {
+    if (!post) return;
+    try {
+      await api.patch(`/api/posts/${post._id}`, { content: newContent });
+      setPost((prev) => prev ? { ...prev, content: newContent } : prev);
+    } catch {}
+  };
+
+  const handleDeletePost = async () => {
+    if (!post) return;
+    try {
+      await api.delete(`/api/posts/${post._id}`);
+      router.push("/feed");
+    } catch {}
+  };
+
+  const handleEditComment = async (commentId: string, newContent: string) => {
+    try {
+      await api.patch(`/api/comments/${commentId}`, { content: newContent });
+      setPost((prev) =>
+        prev
+          ? { ...prev, comments: prev.comments.map((c) => c._id === commentId ? { ...c, content: newContent } : c) }
+          : prev
+      );
+    } catch {}
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      await api.delete(`/api/comments/${commentId}`);
+      setPost((prev) =>
+        prev
+          ? { ...prev, comments: prev.comments.filter((c) => c._id !== commentId) }
+          : prev
+      );
+    } catch {}
+  };
+
   const handleReply = (author: string) => {
     setCommentText(`@${author} `);
     inputRef.current?.focus();
@@ -197,6 +236,8 @@ export default function PostDetailsPage() {
                 isLiked={user ? post.likes.includes(user._id) : false}
                 onLike={handleLikePost}
                 onCommentClick={focusInput}
+                onEdit={user && user._id === post.author._id ? handleEditPost : undefined}
+                onDelete={user && user._id === post.author._id ? handleDeletePost : undefined}
               />
             </div>
 
@@ -209,22 +250,28 @@ export default function PostDetailsPage() {
                 </p>
               )}
 
-              {post.comments.map((comment) => (
-                <CommentCard
-                  key={comment._id}
-                  id={comment._id}
-                  author={getAuthorName(comment.author)}
-                  avatarUrl={getAuthorAvatar(comment.author)}
-                  timeAgo={timeAgo(comment.createdAt)}
-                  content={comment.content}
-                  imageUrl={comment.imageUrl}
-                  likes={formatCount(comment.likes?.length ?? 0)}
-                  isLiked={user ? (comment.likes ?? []).includes(user._id) : false}
-                  onLike={() => handleLikeComment(comment._id)}
-                  onReply={handleReply}
-                  onReport={() => setReportingCommentId(comment._id)}
-                />
-              ))}
+              {post.comments.map((comment) => {
+                const commentAuthorId = typeof comment.author === "object" ? comment.author._id : null;
+                const isCommentAuthor = !!(user && commentAuthorId && user._id === commentAuthorId);
+                return (
+                  <CommentCard
+                    key={comment._id}
+                    id={comment._id}
+                    author={getAuthorName(comment.author)}
+                    avatarUrl={getAuthorAvatar(comment.author)}
+                    timeAgo={timeAgo(comment.createdAt)}
+                    content={comment.content}
+                    imageUrl={comment.imageUrl}
+                    likes={formatCount(comment.likes?.length ?? 0)}
+                    isLiked={user ? (comment.likes ?? []).includes(user._id) : false}
+                    onLike={() => handleLikeComment(comment._id)}
+                    onReply={handleReply}
+                    onReport={!isCommentAuthor ? () => setReportingCommentId(comment._id) : undefined}
+                    onEdit={isCommentAuthor ? (newContent) => handleEditComment(comment._id, newContent) : undefined}
+                    onDelete={isCommentAuthor ? () => handleDeleteComment(comment._id) : undefined}
+                  />
+                );
+              })}
             </div>
           </>
         )}

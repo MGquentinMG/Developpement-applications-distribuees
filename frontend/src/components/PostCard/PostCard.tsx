@@ -6,7 +6,8 @@ import Avatar from "../Avatar/Avatar";
 import PostAction from "../PostAction/PostAction";
 import ShareModal from "../ShareModal/ShareModal";
 import ReportModal from "../ReportModal/ReportModal";
-import { Heart, MessageCircle, Upload, MoreHorizontal, Flag } from "lucide-react";
+import EditModal from "../EditModal/EditModal";
+import { Heart, MessageCircle, Upload, MoreHorizontal, Flag, Pencil, Trash2 } from "lucide-react";
 import { PostCardProps } from "../../types/PostCardType";
 import { renderContentWithHashtags, truncateAuthor } from "../../utils/TextUtil";
 import { usePostCard } from "../../hooks/usePostCard";
@@ -25,6 +26,8 @@ export default function PostCard({
   onRequireAuth,
   onCommentClick,
   onLike,
+  onEdit,
+  onDelete,
 }: PostCardProps) {
   const {
     isLiked,
@@ -40,6 +43,8 @@ export default function PostCard({
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const displayAuthor = truncateAuthor(author);
 
@@ -57,9 +62,25 @@ export default function PostCard({
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsMenuOpen(false);
+    if (!confirm("Supprimer ce post ?")) return;
+    setDeleting(true);
+    try {
+      await onDelete?.();
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <>
-      <article onClick={handleCardClick} className="block relative bg-[#A395DA]/[0.14] dark:bg-[#2A2438] rounded-3xl p-4 pt-9 mb-8 **mx-4 md:mx-0** shadow-[0_2px_15px_rgba(0,0,0,0.03)] dark:shadow-none transition-colors duration-300 cursor-pointer hover:opacity-95">
+      <article
+        onClick={handleCardClick}
+        className={`block relative bg-[#A395DA]/[0.14] dark:bg-[#2A2438] rounded-3xl p-4 pt-9 mb-8 mx-4 md:mx-0 shadow-[0_2px_15px_rgba(0,0,0,0.03)] dark:shadow-none transition-colors duration-300 cursor-pointer hover:opacity-95 ${isMenuOpen ? "z-50" : ""} ${deleting ? "opacity-40 pointer-events-none" : ""}`}
+      >
         <button
           onClick={handleProfileClick}
           className="absolute -top-4 -left-4 flex items-center max-w-[50%] hover:opacity-80 transition-opacity"
@@ -87,7 +108,7 @@ export default function PostCard({
               <MoreHorizontal size={18} strokeWidth={2} />
             </button>
             {isMenuOpen && (
-              <div className="absolute right-0 top-7 bg-white dark:bg-[#1A1A2E] border border-gray-100 dark:border-gray-700 rounded-2xl shadow-lg z-20 overflow-hidden min-w-[140px]">
+              <div className="absolute right-0 top-7 bg-white dark:bg-[#1A1A2E] border border-gray-100 dark:border-gray-700 rounded-2xl shadow-lg z-[100] overflow-hidden min-w-[150px]">
                 <button
                   onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsMenuOpen(false); setIsReportModalOpen(true); }}
                   className="w-full flex items-center gap-2 px-4 py-3 text-[13px] text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
@@ -95,6 +116,24 @@ export default function PostCard({
                   <Flag size={14} strokeWidth={2} />
                   Signaler
                 </button>
+                {onEdit && (
+                  <button
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsMenuOpen(false); setIsEditModalOpen(true); }}
+                    className="w-full flex items-center gap-2 px-4 py-3 text-[13px] text-[#492775] dark:text-[#A395DA] hover:bg-[#F5F0FF] dark:hover:bg-[#492775]/20 transition-colors"
+                  >
+                    <Pencil size={14} strokeWidth={2} />
+                    Modifier
+                  </button>
+                )}
+                {onDelete && (
+                  <button
+                    onClick={handleDelete}
+                    className="w-full flex items-center gap-2 px-4 py-3 text-[13px] text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                  >
+                    <Trash2 size={14} strokeWidth={2} />
+                    Supprimer
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -121,6 +160,13 @@ export default function PostCard({
         isOpen={isReportModalOpen}
         postId={id}
         onClose={() => setIsReportModalOpen(false)}
+      />
+      <EditModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={async (c) => { await onEdit?.(c); }}
+        initialContent={content}
+        title="Modifier le post"
       />
     </>
   );
