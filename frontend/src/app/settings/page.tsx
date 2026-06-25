@@ -23,7 +23,7 @@ export default function SettingsPage() {
   const [notifFollows, setNotifFollows] = useState(true);
 
   return (
-    <main className="min-h-screen bg-white dark:bg-[#121212] pb-32 transition-colors duration-300">
+    <main className="w-full max-w-2xl mx-auto min-h-screen bg-white dark:bg-[#121212] md:border-x border-gray-200 dark:border-gray-800 pb-32 transition-colors duration-300">
       <div className="flex items-center justify-between px-4 py-4 sticky top-0 bg-white dark:bg-[#121212] z-10 border-b border-gray-50 dark:border-gray-800 transition-colors duration-300">
         <div className="w-10">
           <BackButton />
@@ -38,26 +38,19 @@ export default function SettingsPage() {
         </div>
         <div className="flex flex-col">
           <span className="text-[#1E1E40] dark:text-[#F9F9FB] text-[19px] font-bold">@{user?.username ?? "..."}</span>
-          <button className="flex items-center text-[#8B7BB5] dark:text-[#A395DA] text-sm mt-0.5 hover:underline">
+          <button className="flex items-center text-[#8B7BB5] dark:text-[#A395DA] text-sm mt-0.5 hover:underline cursor-pointer border-none bg-transparent">
             {t("settings.editProfile")} <ChevronRight size={16} className="ml-1" />
           </button>
         </div>
       </div>
 
       <div className="px-6 flex flex-col">
-        <Link 
-          href="#"
-          className="flex items-center justify-between py-4 text-[#1E1E40] dark:text-[#F9F9FB] text-[17px] hover:bg-gray-50 dark:hover:bg-[#1A1A2E] transition-colors"
-        >
-          <span>{t("settings.accountSettings")}</span>
-          <ChevronRight size={20} className="text-[#1E1E40] dark:text-[#F9F9FB]" />
-        </Link>
 
         <AccordionItem title={t("settings.appearance")} variant="settings">
           <div className="flex gap-4 px-2">
             <button 
               onClick={() => toggleTheme("light")}
-              className={`flex-1 py-2.5 rounded-xl border-2 font-bold transition-all ${
+              className={`flex-1 py-2.5 rounded-xl border-2 font-bold transition-all cursor-pointer ${
                 theme === "light" 
                   ? "border-[#492775] text-[#492775] bg-[#F5F0FF] dark:bg-[#2A2438] dark:text-[#D0C9E8] dark:border-[#D0C9E8]" 
                   : "border-gray-200 text-gray-500 hover:border-gray-300 dark:border-gray-700 dark:text-gray-400"
@@ -67,7 +60,7 @@ export default function SettingsPage() {
             </button>
             <button 
               onClick={() => toggleTheme("dark")}
-              className={`flex-1 py-2.5 rounded-xl border-2 font-bold transition-all ${
+              className={`flex-1 py-2.5 rounded-xl border-2 font-bold transition-all cursor-pointer ${
                 theme === "dark" 
                   ? "border-[#492775] text-[#492775] bg-[#F5F0FF] dark:bg-[#2A2438] dark:text-[#D0C9E8] dark:border-[#D0C9E8]" 
                   : "border-gray-200 text-gray-500 hover:border-gray-300 dark:border-gray-700 dark:text-gray-400"
@@ -91,7 +84,7 @@ export default function SettingsPage() {
           <div className="flex gap-4 px-2">
             <button 
               onClick={() => i18n.changeLanguage('fr')}
-              className={`flex-1 py-2.5 rounded-xl border-2 font-bold transition-all ${
+              className={`flex-1 py-2.5 rounded-xl border-2 font-bold transition-all cursor-pointer ${
                 i18n.language === "fr" 
                   ? "border-[#492775] text-[#492775] bg-[#F5F0FF] dark:bg-[#2A2438] dark:text-[#D0C9E8] dark:border-[#D0C9E8]" 
                   : "border-gray-200 text-gray-500 hover:border-gray-300 dark:border-gray-700 dark:text-gray-400"
@@ -101,7 +94,7 @@ export default function SettingsPage() {
             </button>
             <button 
               onClick={() => i18n.changeLanguage('en')}
-              className={`flex-1 py-2.5 rounded-xl border-2 font-bold transition-all ${
+              className={`flex-1 py-2.5 rounded-xl border-2 font-bold transition-all cursor-pointer ${
                 i18n.language === "en" 
                   ? "border-[#492775] text-[#492775] bg-[#F5F0FF] dark:bg-[#2A2438] dark:text-[#D0C9E8] dark:border-[#D0C9E8]" 
                   : "border-gray-200 text-gray-500 hover:border-gray-300 dark:border-gray-700 dark:text-gray-400"
@@ -119,7 +112,7 @@ export default function SettingsPage() {
           </div>
         </AccordionItem>
 
-        <button onClick={logout} className="text-left py-4 text-[#E50000] dark:text-[#FF6B6B] font-bold text-[17px] mt-2 hover:bg-gray-50 dark:hover:bg-[#1A1A2E] transition-colors">
+        <button onClick={logout} className="text-left py-4 text-[#E50000] dark:text-[#FF6B6B] font-bold text-[17px] mt-2 hover:bg-gray-50 dark:hover:bg-[#1A1A2E] transition-colors cursor-pointer border-none bg-transparent">
           {t("settings.signOut")}
         </button>
         

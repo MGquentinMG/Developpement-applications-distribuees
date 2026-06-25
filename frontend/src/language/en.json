@@ -209,5 +209,31 @@
     "legalWarning": "Please note that knowingly filing a false report may be punishable by law. If you repeatedly file clearly unfounded reports, we reserve the right to suspend your ability to report or permanently ban your account.",
     "submitBtn": "Report",
     "successMsg": "Thank you for your report :)"
+  },
+  "legal": {
+    "title": "Legal Notice",
+    "section1": "Contracting entities",
+    "section1_intro": "The company with which you enter into a contract depends on your country of residence or principal place of business:",
+    "section1_li1": "If you reside in a country within the European Economic Area (\"EEA\") or in Switzerland, your contract is entered into with Breezy Technology Limited. This company is registered in the Republic of Ireland, with its registered office at The Sorting Office, Ropemaker Place, Arras 2, D02 HD23, and registration number 67676767.",
+    "section1_li2": "If you reside in the United Kingdom, your contract is entered into with Breezy Information Technologies UK Limited. This company is registered in England, with its registered office at 4 Lindsey Street, Barbican, London, EC1A 9HP, United Kingdom, and registration number 10165711.",
+    "section1_outro": "We, together with our affiliated companies (such as Breezy Information Technologies UK Limited, Breezy Inc. and Breezy Pte. Ltd.) (\"Affiliates\") provide the Platform worldwide.",
+    "section2": "Access and usage conditions",
+    "section2_intro": "To access and use the Platform, you must agree to these Terms of Use. By creating an account or using our services, you acknowledge that you have read, understood, and agreed to be bound by these terms.",
+    "section2_li1": "You must be at least 13 years old to use the Platform. If you are between 13 and 18 years old, you declare that you have obtained the consent of your legal guardian to use our services.",
+    "section2_li2": "You are responsible for the confidentiality of your login credentials and all activities carried out from your account. In the event of unauthorized access, you agree to notify us immediately.",
+    "section2_li3": "Breezy reserves the right to suspend or terminate your account in the event of a breach of these terms, fraudulent behavior, or any activity likely to undermine the integrity of the Platform or the security of other users.",
+    "section2_outro": "An account may only be associated with a single individual. Creating multiple accounts for the purposes of abuse, spam, or circumventing sanctions is strictly prohibited and will result in the permanent deletion of all accounts involved.",
+    "section3": "Content and responsibilities",
+    "section3_intro": "When using the Platform, you may publish, share, or transmit content (text, images, videos, links, etc.). You retain all intellectual property rights over the content you create, but you grant Breezy a worldwide, non-exclusive, royalty-free license to use it in connection with the operation of the Platform.",
+    "section3_li1": "You are strictly prohibited from posting content that is illegal, defamatory, obscene, hateful, threatening, or that infringes on the rights of third parties, including intellectual property rights or the privacy of others.",
+    "section3_li2": "Any content reported as inappropriate by the community will be reviewed by our moderation team. Breezy reserves the right to remove any content that violates our rules, without prior notice or justification.",
+    "section3_li3": "You agree not to use the Platform to distribute malware, engage in phishing activities, automate interactions without our express consent, or attempt to compromise the security of our infrastructure.",
+    "section3_outro": "Breezy provides reporting tools to enable the community to actively contribute to moderation. We encourage users to report any content or behavior that violates our rules using the report button available on each post.",
+    "section4": "Personal data and privacy",
+    "section4_intro": "As part of providing our services, Breezy collects and processes certain personal data about you, in accordance with the General Data Protection Regulation (GDPR) and applicable privacy legislation.",
+    "section4_li1": "The data collected includes your identification information (username, email address), the content you publish, your interactions with other users, and technical data related to your use of the Platform (IP address, device type, cookies).",
+    "section4_li2": "You have the right to access, rectify, delete, and port your personal data. To exercise these rights, you may submit your request to our data protection officer.",
+    "section4_li3": "Breezy never sells your personal data to third parties. Certain data may be shared with technical service providers acting as data processors, strictly within the scope of providing our services, and subject to contractual confidentiality obligations.",
+    "section4_outro": "For any questions regarding the processing of your data or to lodge a complaint, you may also contact the supervisory authority in your country of residence. In the United Kingdom, this is the Information Commissioner's Office (ICO)."
   }
 }

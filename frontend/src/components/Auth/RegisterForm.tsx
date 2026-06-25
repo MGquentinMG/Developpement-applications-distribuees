@@ -9,7 +9,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import "../../i18n";
 
 const GoogleIcon = () => (
-  <svg viewBox="0 0 24 24" width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
     <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
@@ -18,7 +18,7 @@ const GoogleIcon = () => (
 );
 
 const UserIcon = () => (
-  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" className="text-gray-500 dark:text-[#D0C9E8]">
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" className="text-gray-500 dark:text-[#D0C9E8]">
     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
   </svg>
 );
@@ -35,7 +35,6 @@ export function RegisterForm({ onSwitchMode, onClose }: AuthFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   
-  // États pour la date de naissance
   const [day, setDay] = useState("");
   const [month, setMonth] = useState("");
   const [year, setYear] = useState("");
@@ -98,47 +97,47 @@ export function RegisterForm({ onSwitchMode, onClose }: AuthFormProps) {
   }
 
   return (
-    <div className="bg-white dark:bg-[#1A1A2E] rounded-3xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.5)] w-full max-w-[400px] p-8 pt-10 relative transition-colors duration-300">
-      <button onClick={onClose} className="absolute top-4 right-4 bg-gray-200 dark:bg-[#2A2438] hover:bg-gray-300 dark:hover:bg-[#3A304D] rounded-full w-7 h-7 flex items-center justify-center text-gray-600 dark:text-gray-300 transition-colors cursor-pointer border-none">
+    <div className="bg-white dark:bg-[#1A1A2E] rounded-3xl shadow-xl w-full max-w-[500px] p-10 pt-12 relative transition-colors duration-300">
+      <button onClick={onClose} className="absolute top-5 right-5 bg-gray-200 dark:bg-[#2A2438] hover:bg-gray-300 dark:hover:bg-[#3A304D] rounded-full w-8 h-7 flex items-center justify-center text-gray-600 dark:text-gray-300 transition-colors cursor-pointer border-none">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
       </button>
 
-      <div className="text-center mb-8">
-        <h2 className="text-[32px] font-bold text-black dark:text-[#F9F9FB] tracking-tight leading-tight">{t("auth.registerTitle")}</h2>
-        <h1 className="text-[34px] font-bold text-[#A69ACA] dark:text-[#8B7BB5] mt-1 tracking-wider uppercase">BREEZY</h1>
+      <div className="text-center mb-10">
+        <h2 className="text-[36px] font-black text-black dark:text-[#F9F9FB] tracking-tight leading-tight">{t("auth.registerTitle")}</h2>
+        <h1 className="text-[38px] font-black text-[#A69ACA] dark:text-[#8B7BB5] mt-1 tracking-wider uppercase">BREEZY</h1>
       </div>
 
       {step === 1 ? (
-        <div className="space-y-4 px-2">
-          <button type="button" className="w-full flex items-center justify-center gap-3 bg-[#F3F4F6] dark:bg-[#2A2438] text-gray-800 dark:text-[#F9F9FB] font-medium rounded-full text-sm px-5 py-3 hover:bg-gray-200 dark:hover:bg-[#3A304D] transition-colors cursor-pointer border-none">
+        <div className="space-y-5 px-2">
+          <button type="button" className="w-full flex items-center justify-center gap-4 bg-[#F3F4F6] dark:bg-[#2A2438] text-gray-800 dark:text-[#F9F9FB] font-bold rounded-full text-base px-6 py-4 hover:bg-gray-200 dark:hover:bg-[#3A304D] transition-colors cursor-pointer border-none">
             <GoogleIcon /> {t("auth.googleRegister")}
           </button>
-          <button type="button" onClick={() => setStep(2)} className="w-full flex items-center justify-center gap-3 bg-[#F3F4F6] dark:bg-[#2A2438] text-gray-800 dark:text-[#F9F9FB] font-medium rounded-full text-sm px-5 py-3 hover:bg-gray-200 dark:hover:bg-[#3A304D] transition-colors cursor-pointer border-none">
+          <button type="button" onClick={() => setStep(2)} className="w-full flex items-center justify-center gap-4 bg-[#F3F4F6] dark:bg-[#2A2438] text-gray-800 dark:text-[#F9F9FB] font-bold rounded-full text-base px-6 py-4 hover:bg-gray-200 dark:hover:bg-[#3A304D] transition-colors cursor-pointer border-none">
             <UserIcon /> {t("auth.emailRegister")}
           </button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4 px-2">
+        <form onSubmit={handleSubmit} className="space-y-5 px-2">
           <div>
-            <label className="block text-sm text-gray-900 dark:text-[#F9F9FB] mb-1">{t("auth.pseudoLabel")}</label>
+            <label className="block text-sm font-bold text-gray-900 dark:text-[#F9F9FB] mb-1">{t("auth.pseudoLabel")}</label>
             <InputField type="text" placeholder={t("auth.pseudoPlaceholder")} value={pseudo} onChange={(e) => setPseudo(e.target.value)} required />
           </div>
 
           <div>
-            <label className="block text-sm text-gray-900 dark:text-[#F9F9FB] mb-1">{t("auth.emailLabel")}</label>
+            <label className="block text-sm font-bold text-gray-900 dark:text-[#F9F9FB] mb-1">{t("auth.emailLabel")}</label>
             <InputField type="email" placeholder={t("auth.emailLabel")} value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
 
           <div>
-            <label className="block text-sm text-gray-900 dark:text-[#F9F9FB] mb-1">{t("auth.passwordLabel")}</label>
+            <label className="block text-sm font-bold text-gray-900 dark:text-[#F9F9FB] mb-1">{t("auth.passwordLabel")}</label>
             <InputField type="password" placeholder={t("auth.passwordLabel")} value={password} onChange={(e) => setPassword(e.target.value)} required />
           </div>
           
           <div>
-            <label className="block text-sm text-gray-900 dark:text-[#F9F9FB] mb-1">{t("auth.dobLabel")}</label>
-            <div className="flex gap-2">
+            <label className="block text-sm font-bold text-gray-900 dark:text-[#F9F9FB] mb-1">{t("auth.dobLabel")}</label>
+            <div className="flex gap-3">
               <div className="relative w-full">
-                <select className="bg-[#F3F4F6] dark:bg-[#2A2438] text-gray-500 dark:text-[#F9F9FB] text-sm rounded-lg p-2.5 w-full outline-none appearance-none cursor-pointer pr-8" value={day} onChange={(e) => handleSelectChange(e, setDay)} required>
+                <select className="bg-[#F3F4F6] dark:bg-[#2A2438] text-gray-500 dark:text-[#F9F9FB] text-sm font-medium rounded-lg p-3 w-full outline-none appearance-none cursor-pointer pr-8" value={day} onChange={(e) => handleSelectChange(e, setDay)} required>
                   <option value="">{t("auth.day")}</option>
                   {Array.from({length: 31}, (_, i) => <option key={i+1} value={i+1}>{i+1}</option>)}
                 </select>
@@ -148,7 +147,7 @@ export function RegisterForm({ onSwitchMode, onClose }: AuthFormProps) {
               </div>
               
               <div className="relative w-full">
-                <select className="bg-[#F3F4F6] dark:bg-[#2A2438] text-gray-500 dark:text-[#F9F9FB] text-sm rounded-lg p-2.5 w-full outline-none appearance-none cursor-pointer pr-8" value={month} onChange={(e) => handleSelectChange(e, setMonth)} required>
+                <select className="bg-[#F3F4F6] dark:bg-[#2A2438] text-gray-500 dark:text-[#F9F9FB] text-sm font-medium rounded-lg p-3 w-full outline-none appearance-none cursor-pointer pr-8" value={month} onChange={(e) => handleSelectChange(e, setMonth)} required>
                   <option value="">{t("auth.month")}</option>
                   {months.map((m, i) => <option key={i+1} value={i+1}>{m}</option>)}
                 </select>
@@ -158,7 +157,7 @@ export function RegisterForm({ onSwitchMode, onClose }: AuthFormProps) {
               </div>
 
               <div className="relative w-full">
-                <select className="bg-[#F3F4F6] dark:bg-[#2A2438] text-gray-500 dark:text-[#F9F9FB] text-sm rounded-lg p-2.5 w-full outline-none appearance-none cursor-pointer pr-8" value={year} onChange={(e) => handleSelectChange(e, setYear)} required>
+                <select className="bg-[#F3F4F6] dark:bg-[#2A2438] text-gray-500 dark:text-[#F9F9FB] text-sm font-medium rounded-lg p-3 w-full outline-none appearance-none cursor-pointer pr-8" value={year} onChange={(e) => handleSelectChange(e, setYear)} required>
                   <option value="">{t("auth.year")}</option>
                   {Array.from({length: 100}, (_, i) => { const y = new Date().getFullYear() - i; return <option key={y} value={y}>{y}</option> })}
                 </select>
@@ -169,38 +168,39 @@ export function RegisterForm({ onSwitchMode, onClose }: AuthFormProps) {
             </div>
           </div>
 
-          <div className="flex items-start gap-2 pt-2">
+          <div className="flex items-start gap-3 pt-2">
             <input 
               type="checkbox" 
               id="terms"
-              className="mt-1 w-4 h-4 rounded border-gray-300 cursor-pointer text-[#A69ACA] focus:ring-[#A69ACA]"
+              className="mt-1 w-5 h-5 rounded border-gray-300 cursor-pointer text-[#A69ACA] focus:ring-[#A69ACA]"
               checked={acceptTerms} 
               onChange={(e) => setAcceptTerms(e.target.checked)} 
               required 
             />
-            <label htmlFor="terms" className="text-[10px] text-gray-500 dark:text-[#A395DA] leading-tight cursor-pointer">
+            <label htmlFor="terms" className="text-[11px] text-gray-500 dark:text-[#A395DA] leading-tight cursor-pointer">
               {t("auth.terms")}
             </label>
           </div>
 
+          <p></p>
           <ErrorMessage message={error || undefined} />
           
-          <button type="submit" disabled={isLoading} className="w-full bg-[#A69ACA] dark:bg-[#492775] text-white font-medium rounded-full text-sm px-5 py-3 mt-2 hover:bg-[#9084b8] dark:hover:bg-[#3a1f5d] transition-colors cursor-pointer border-none">
+          <button type="submit" disabled={isLoading} className="w-full bg-[#A69ACA] dark:bg-[#492775] text-white font-bold rounded-full text-base px-5 py-4 mt-2 hover:bg-[#9084b8] dark:hover:bg-[#3a1f5d] transition-colors cursor-pointer border-none">
             {isLoading ? t("auth.loading") : t("auth.submit")}
           </button>
         </form>
       )}
 
       {step === 1 && (
-        <div className="mt-8 text-center text-[8px] text-gray-500 px-8 leading-tight">
+        <div className="mt-10 text-center text-[10px] text-gray-400 px-6 leading-tight">
           {t("auth.termsShort")}
         </div>
       )}
 
-      <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800 text-center">
+      <div className="mt-8 pt-5 border-t border-gray-100 dark:border-gray-800 text-center">
         <p className="text-sm text-gray-800 dark:text-gray-300">
           {t("auth.hasAccount")} <br/>
-          <button onClick={onSwitchMode} className="text-[#A69ACA] dark:text-[#8B7BB5] hover:underline cursor-pointer bg-transparent border-none mt-1">
+          <button onClick={onSwitchMode} className="text-[#A69ACA] dark:text-[#8B7BB5] hover:underline cursor-pointer bg-transparent border-none mt-2 font-bold text-base">
             {t("auth.signIn")}
           </button>
         </p>

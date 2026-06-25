@@ -2,11 +2,14 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
+import { useTranslation } from "react-i18next";
+import "../../../i18n";
 import BackButton from "../../../components/BackButton/BackButton";
 import PostCard from "../../../components/PostCard/PostCard";
 import CommentCard from "../../../components/CommentCard/CommentCard";
 import ReportModal from "../../../components/ReportModal/ReportModal";
 import MessageInput from "../../../components/MessageInput/MessageInput";
+import Navbar from "../../../components/Navbar/Navbar";
 import { api, timeAgo, formatCount } from "../../../services/api";
 import { useAuth } from "../../../contexts/AuthContext";
 
@@ -31,6 +34,7 @@ interface ApiPost {
 }
 
 export default function PostDetailsPage() {
+  const { t } = useTranslation();
   const params = useParams();
   const postId = params?.id as string;
   const { user } = useAuth();
@@ -137,88 +141,87 @@ export default function PostDetailsPage() {
   };
 
   return (
-    <main className="min-h-screen bg-white dark:bg-[#121212] pb-32 transition-colors duration-300 relative">
-      <div className="flex items-center gap-4 px-4 py-4 sticky top-0 bg-white/90 dark:bg-[#121212]/90 backdrop-blur-md z-20 border-b border-gray-100 dark:border-gray-800 transition-colors duration-300">
-        <BackButton />
-        <h1 className="text-[#1E1E40] dark:text-[#F9F9FB] font-bold text-[17px] transition-colors duration-300">
-          Breezy
-        </h1>
-      </div>
+    <div className="w-full max-w-[1400px] mx-auto flex flex-col md:flex-row min-h-screen bg-white dark:bg-[#121212] transition-colors duration-300">
+      <Navbar />
 
-      {loading && (
-        <p className="text-center text-gray-400 dark:text-gray-500 mt-16 text-sm">
-          Chargement...
-        </p>
-      )}
+      <main className="flex-1 w-full max-w-2xl min-h-screen bg-[#F9F9FB] dark:bg-[#121212] border-x border-gray-200 dark:border-gray-800 pb-32 transition-colors duration-300 relative">
+        <div className="flex items-center gap-4 px-4 py-4 sticky top-0 bg-[#F9F9FB]/90 dark:bg-[#121212]/90 backdrop-blur-md z-20 border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
+          <BackButton />
+          <h1 className="text-[#1E1E40] dark:text-[#F9F9FB] font-bold text-[17px] transition-colors duration-300">
+            Breezy
+          </h1>
+        </div>
 
-      {!loading && !post && (
-        <p className="text-center text-gray-400 dark:text-gray-500 mt-16 text-sm">
-          Post introuvable.
-        </p>
-      )}
+        {loading && (
+          <p className="text-center text-gray-400 dark:text-gray-500 mt-16 text-sm">
+            Chargement...
+          </p>
+        )}
 
-      {!loading && post && (
-        <>
-          <div className="pt-6">
-            <PostCard
-              id={post._id}
-              author={post.author?.username ?? "Anonyme"}
-              timeAgo={timeAgo(post.createdAt)}
-              content={post.content}
-              imageUrl={post.image}
-              likes={formatCount(post.likes.length)}
-              comments={formatCount(post.comments.length)}
-              shares="0"
-              avatarUrl={post.author?.avatar}
-              onCommentClick={focusInput}
-            />
-          </div>
+        {!loading && !post && (
+          <p className="text-center text-gray-400 dark:text-gray-500 mt-16 text-sm">
+            Post introuvable.
+          </p>
+        )}
 
-          <div className="px-5 mt-2">
-            <div className="h-[1px] w-full bg-gray-100 dark:bg-[#2A2438] mb-6 transition-colors duration-300" />
-
-            {post.comments.length === 0 && (
-              <p className="text-center text-gray-400 dark:text-gray-500 text-sm italic mb-6">
-                Aucun commentaire pour le moment.
-              </p>
-            )}
-
-            {post.comments.map((comment) => (
-              <CommentCard
-                key={comment._id}
-                id={comment._id}
-                author={getAuthorName(comment.author)}
-                avatarUrl={getAuthorAvatar(comment.author)}
-                timeAgo={timeAgo(comment.createdAt)}
-                content={comment.content}
-                imageUrl={comment.imageUrl}
-                likes={formatCount(comment.likes?.length ?? 0)}
-                isLiked={user ? (comment.likes ?? []).includes(user._id) : false}
-                onLike={() => handleLikeComment(comment._id)}
-                onReply={handleReply}
-                onReport={user ? () => setReportingCommentId(comment._id) : undefined}
+        {!loading && post && (
+          <>
+            <div className="pt-6">
+              <PostCard
+                id={post._id}
+                author={post.author?.username ?? "Anonyme"}
+                timeAgo={timeAgo(post.createdAt)}
+                content={post.content}
+                imageUrl={post.image}
+                likes={formatCount(post.likes.length)}
+                comments={formatCount(post.comments.length)}
+                shares="0"
+                avatarUrl={post.author?.avatar}
+                onCommentClick={focusInput}
               />
-            ))}
-          </div>
-        </>
-      )}
+            </div>
 
-      <MessageInput
-        value={commentText}
-        onChange={setCommentText}
-        onSend={handleSendComment}
-        onImageSelect={handleCommentImageSelect}
-        imagePreview={commentImagePreview}
-        onRemoveImage={handleRemoveCommentImage}
-        placeholder={user ? "Ajouter un commentaire..." : "Connecte-toi pour commenter"}
-        disabled={!user || sending}
-      />
+            <div className="px-5 mt-2">
+              <div className="h-[1px] w-full bg-gray-200 dark:bg-[#2A2438] mb-6 transition-colors duration-300" />
 
-      <ReportModal
-        isOpen={reportingCommentId !== null}
-        commentId={reportingCommentId ?? undefined}
-        onClose={() => setReportingCommentId(null)}
-      />
-    </main>
+              {post.comments.length === 0 && (
+                <p className="text-center text-gray-400 dark:text-gray-500 text-sm italic mb-6">
+                  Aucun commentaire pour le moment.
+                </p>
+              )}
+
+              {post.comments.map((comment) => (
+                <CommentCard
+                  key={comment._id}
+                  id={comment._id}
+                  author={getAuthorName(comment.author)}
+                  avatarUrl={getAuthorAvatar(comment.author)}
+                  timeAgo={timeAgo(comment.createdAt)}
+                  content={comment.content}
+                  imageUrl={comment.imageUrl}
+                  likes={formatCount(comment.likes?.length ?? 0)}
+                  isLiked={user ? (comment.likes ?? []).includes(user._id) : false}
+                  onLike={() => handleLikeComment(comment._id)}
+                  onReply={handleReply}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
+        <MessageInput
+          value={commentText}
+          onChange={setCommentText}
+          onSend={handleSendComment}
+          onImageSelect={handleCommentImageSelect}
+          imagePreview={commentImagePreview}
+          onRemoveImage={handleRemoveCommentImage}
+          placeholder={user ? "Ajouter un commentaire..." : "Connecte-toi pour commenter"}
+          disabled={!user || sending}
+        />
+      </main>
+      
+      <aside className="hidden lg:block w-[350px] p-6 border-transparent" />
+    </div>
   );
 }

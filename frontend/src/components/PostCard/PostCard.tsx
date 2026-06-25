@@ -59,7 +59,7 @@ export default function PostCard({
 
   return (
     <>
-      <article onClick={handleCardClick} className="block relative bg-[#A395DA]/[0.14] dark:bg-[#2A2438] rounded-3xl p-4 pt-9 mb-8 ml-4 shadow-[0_2px_15px_rgba(0,0,0,0.03)] dark:shadow-none transition-colors duration-300 cursor-pointer hover:opacity-95">
+      <article onClick={handleCardClick} className="block relative bg-[#A395DA]/[0.14] dark:bg-[#2A2438] rounded-3xl p-4 pt-9 mb-8 **mx-4 md:mx-0** shadow-[0_2px_15px_rgba(0,0,0,0.03)] dark:shadow-none transition-colors duration-300 cursor-pointer hover:opacity-95">
         <button
           onClick={handleProfileClick}
           className="absolute -top-4 -left-4 flex items-center max-w-[50%] hover:opacity-80 transition-opacity"

@@ -7,6 +7,7 @@ import "../../../i18n";
 import MessageBubble from "../../../components/MessageBubble/MessageBubble";
 import MessageInput from "../../../components/MessageInput/MessageInput";
 import ConversationHeader from "../../../components/ConversationHeader/ConversationHeader";
+import Navbar from "../../../components/Navbar/Navbar";
 import { MessageBubbleProps } from "../../../types/MessageType";
 import { api } from "../../../services/api";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -103,40 +104,46 @@ export default function ConversationPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#FDFDFD] dark:bg-[#121212] flex flex-col transition-colors duration-300 relative">
-      <ConversationHeader
-        title={recipient ? `@${recipient.username}` : "..."}
-        status=""
-        avatarUrl={recipient?.avatar}
-      />
+    <div className="w-full max-w-[1400px] mx-auto flex flex-col md:flex-row min-h-screen bg-[#FDFDFD] dark:bg-[#121212] transition-colors duration-300">
+      <aside className="hidden lg:block w-[350px] shrink-0" />
 
-      <div className="flex-1 px-4 pt-6 overflow-y-auto pb-32">
-        <div className="flex justify-center mb-6">
-          <span className="bg-gray-100 dark:bg-[#1A1A2E] text-gray-500 dark:text-gray-400 text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider transition-colors duration-300">
-            {t("messages.today", "Aujourd'hui")}
-          </span>
+      <main className="flex-1 w-full max-w-3xl min-h-screen flex flex-col border-x border-gray-200 dark:border-gray-800 transition-colors duration-300 relative">
+        <ConversationHeader
+          title={recipient ? `@${recipient.username}` : "..."}
+          status=""
+          avatarUrl={recipient?.avatar}
+        />
+
+        <div className="flex-1 px-4 pt-6 overflow-y-auto pb-32">
+          <div className="flex justify-center mb-6">
+            <span className="bg-gray-100 dark:bg-[#1A1A2E] text-gray-500 dark:text-gray-400 text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider transition-colors duration-300">
+              {t("messages.today", "Aujourd'hui")}
+            </span>
+          </div>
+
+          {chat.map((msg, idx) => (
+            <MessageBubble
+              key={idx}
+              content={msg.content}
+              isSelf={msg.isSelf}
+              isImage={msg.isImage}
+              imageUrl={msg.imageUrl}
+              author={msg.author}
+            />
+          ))}
+          <div ref={messagesEndRef} />
         </div>
 
-        {chat.map((msg, idx) => (
-          <MessageBubble
-            key={idx}
-            content={msg.content}
-            isSelf={msg.isSelf}
-            isImage={msg.isImage}
-            imageUrl={msg.imageUrl}
-            author={msg.author}
-          />
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
+        <MessageInput
+          value={inputText}
+          onChange={setInputText}
+          onSend={handleSend}
+          onImageSelect={handleImageSelect}
+          placeholder={t("messages.inputPlaceholder")}
+        />
+      </main>
 
-      <MessageInput
-        value={inputText}
-        onChange={setInputText}
-        onSend={handleSend}
-        onImageSelect={handleImageSelect}
-        placeholder={t("messages.inputPlaceholder")}
-      />
-    </main>
+      <Navbar />
+    </div>
   );
 }

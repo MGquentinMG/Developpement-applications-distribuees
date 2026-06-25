@@ -8,6 +8,8 @@ import "../../i18n";
 import SearchBar from "../../components/Searchbar/Searchbar";
 import ThemeSuggestions from "../../components/Suggestionsbar/Suggestionsbar";
 import PostCard from "../../components/PostCard/PostCard";
+import Navbar from "../../components/Navbar/Navbar";
+import Button from "../../components/Button/Button";
 import { api, timeAgo, formatCount } from "../../services/api";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -96,99 +98,119 @@ export default function FeedPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F9F9FB] dark:bg-[#121212] pb-32 transition-colors duration-300">
-      <div className="flex items-center gap-3 px-4 pt-4 pb-3 sticky top-0 bg-[#F9F9FB] dark:bg-[#121212] z-40 transition-colors duration-300">
-        <div
-          className="w-9 h-9 rounded-full bg-[#1E1E40] dark:bg-[#2A2438] flex items-center justify-center flex-shrink-0 transition-colors duration-300 cursor-pointer"
-          onClick={() => router.push("/profile")}
-        >
-          {user?.avatar ? (
-            <img src={user.avatar} alt={user.username} className="w-full h-full rounded-full object-cover" />
-          ) : (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="8" r="4" />
-              <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
-            </svg>
-          )}
+    <div className="w-full max-w-[1400px] mx-auto flex flex-col md:flex-row min-h-screen bg-white dark:bg-[#121212] transition-colors duration-300">
+
+      <aside className="hidden lg:flex lg:flex-col w-[350px] sticky top-0 h-screen overflow-y-auto scrollbar-none pt-4 pl-4 xl:pl-0 pr-8">
+        <div className="mb-6">
+          <SearchBar value={searchQuery} onChange={setSearchQuery} />
         </div>
-        <SearchBar value={searchQuery} onChange={setSearchQuery} />
-        <button
-          onClick={() => router.push("/notifications")}
-          className="w-9 h-9 rounded-full bg-[#EDE9F7] dark:bg-[#2A2438] flex items-center justify-center text-[#492775] dark:text-[#A395DA] hover:bg-[#E0D8F0] dark:hover:bg-[#3A304D] transition-colors flex-shrink-0 cursor-pointer duration-300"
-          aria-label="Notifications"
-        >
-          <Bell size={18} strokeWidth={2.5} />
-        </button>
-      </div>
 
-      <div className="px-5 pb-2 mt-2">
-        <h2 className="text-xs font-bold text-[#1E1E40] dark:text-[#F9F9FB] mb-3 transition-colors duration-300">
-          {t("feed.topHtag")}
-        </h2>
-        <ThemeSuggestions
-          themes={trendingThemes}
-          activeTheme={activeTheme}
-          onThemeChange={setActiveTheme}
-        />
-      </div>
+        <div className="bg-[#F3F4F6] dark:bg-[#1A1A2E] rounded-2xl py-6 px-5 shadow-sm border border-transparent dark:border-gray-800">
+          <h2 className="text-lg font-black text-[#1E1E40] dark:text-[#F9F9FB] mb-5">Tendances pour vous</h2>
+          <div className="flex flex-col gap-4">
+            {trendingThemes.map((theme) => (
+              <div key={theme} className="flex items-center">
+                <Button
+                  label={theme}
+                  defaultActive={activeTheme === theme}
+                  onClick={() => setActiveTheme(activeTheme === theme ? null : theme)}
+                />
+              </div>
+            ))}
+            {trendingThemes.length === 0 && !loading && (
+              <p className="text-sm text-gray-500">Aucune tendance pour le moment.</p>
+            )}
+          </div>
+        </div>
 
-      <div className="flex px-5 border-b border-gray-200 dark:border-gray-800 mt-3">
-        <button
-          onClick={() => setActiveTab("all")}
-          className={`flex-1 py-2.5 text-[13px] font-bold transition-all border-b-2 -mb-[2px] ${
-            activeTab === "all"
-              ? "border-[#492775] text-[#492775] dark:text-[#A395DA] dark:border-[#A395DA]"
-              : "border-transparent text-gray-400 dark:text-gray-500 hover:text-[#492775] dark:hover:text-[#A395DA]"
-          }`}
-        >
-          Tout
-        </button>
-        <button
-          onClick={() => setActiveTab("following")}
-          className={`flex-1 py-2.5 text-[13px] font-bold transition-all border-b-2 -mb-[2px] ${
-            activeTab === "following"
-              ? "border-[#492775] text-[#492775] dark:text-[#A395DA] dark:border-[#A395DA]"
-              : "border-transparent text-gray-400 dark:text-gray-500 hover:text-[#492775] dark:hover:text-[#A395DA]"
-          }`}
-        >
-          Abonnements
-        </button>
-      </div>
+        <div className="flex flex-wrap gap-x-3 gap-y-1 mt-6 px-4 text-[12px] text-gray-500">
+          <a href="/legal" className="hover:underline">Conditions utilisation</a>
+          <a href="/legal" className="hover:underline">Politique de confidentialité</a>
+          <a href="/legal" className="hover:underline">Accessibilité</a>
+          <span>© 2026 Breezy</span>
+        </div>
+      </aside>
 
-      <section className="px-4 pt-4">
-        {loading && (
-          <p className="text-center text-gray-400 dark:text-gray-500 mt-10 text-sm">
-            Chargement...
-          </p>
-        )}
+      <main className="w-full max-w-2xl min-h-screen bg-[#F9F9FB] dark:bg-[#121212] border-x border-gray-200 dark:border-gray-800 pb-32 md:pb-0 transition-colors duration-300">
+        <div className="sticky top-0 z-40 bg-[#F9F9FB]/80 dark:bg-[#121212]/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
 
-        {!loading &&
-          filteredPosts.map((post) => (
-            <PostCard
-              key={post._id}
-              id={post._id}
-              author={post.author?.username ?? "Anonyme"}
-              timeAgo={timeAgo(post.createdAt)}
-              content={post.content}
-              likes={formatCount(post.likes.length)}
-              comments={formatCount(post.comments.length)}
-              shares="0"
-              avatarUrl={post.author?.avatar}
-              imageUrl={post.image}
-              isLiked={user ? post.likes.includes(user._id) : false}
-              onLike={user ? () => handleLike(post._id) : undefined}
-              onRequireAuth={!user ? () => router.push("/login") : undefined}
-            />
-          ))}
+          <div className="flex items-center justify-between lg:hidden px-4 pt-4 pb-2">
+            <div className="w-9 h-9 rounded-full bg-[#1E1E40] dark:bg-[#2A2438] flex items-center justify-center cursor-pointer overflow-hidden" onClick={() => router.push("/profile")}>
+              {user?.avatar ? <img src={user.avatar} className="w-full h-full object-cover" alt="avatar" /> : <div className="w-4 h-4 bg-white rounded-full" />}
+            </div>
+            <div className="flex-1 mx-3">
+              <SearchBar value={searchQuery} onChange={setSearchQuery} />
+            </div>
+            <button onClick={() => router.push("/notifications")} className="w-9 h-9 rounded-full bg-[#EDE9F7] dark:bg-[#2A2438] flex items-center justify-center text-[#492775] dark:text-[#A395DA]">
+              <Bell size={18} strokeWidth={2.5} />
+            </button>
+          </div>
 
-        {!loading && filteredPosts.length === 0 && (
-          <p className="text-center text-gray-400 dark:text-gray-500 mt-10 text-sm transition-colors duration-300">
-            {activeTab === "following"
-              ? "Abonne-toi à des personnes pour voir leurs posts ici."
-              : t("feed.noPosts")}
-          </p>
-        )}
-      </section>
-    </main>
+          <div className="hidden lg:flex items-center px-6 pt-6 pb-2">
+            <h1 className="text-xl font-bold text-[#1E1E40] dark:text-[#F9F9FB]">Accueil</h1>
+          </div>
+
+          <div className="flex px-5 mt-1">
+            <button
+              onClick={() => setActiveTab("all")}
+              className={`flex-1 py-3 text-[15px] font-bold transition-all border-b-[3px] -mb-[1px] ${
+                activeTab === "all" ? "border-[#492775] text-[#1E1E40] dark:text-[#F9F9FB] dark:border-[#A395DA]" : "border-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-[#2A2438]/50"
+              }`}
+            >
+              Pour vous
+            </button>
+            <button
+              onClick={() => setActiveTab("following")}
+              className={`flex-1 py-3 text-[15px] font-bold transition-all border-b-[3px] -mb-[1px] ${
+                activeTab === "following" ? "border-[#492775] text-[#1E1E40] dark:text-[#F9F9FB] dark:border-[#A395DA]" : "border-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-[#2A2438]/50"
+              }`}
+            >
+              Abonnements
+            </button>
+          </div>
+        </div>
+
+        <div className="lg:hidden px-5 pt-4 pb-2">
+          <h2 className="text-xs font-bold text-[#1E1E40] dark:text-[#F9F9FB] mb-3">Tendances</h2>
+          <ThemeSuggestions themes={trendingThemes} activeTheme={activeTheme} onThemeChange={setActiveTheme} />
+        </div>
+
+        <section className="pt-2 px-4">
+          {loading && (
+            <div className="flex justify-center mt-10">
+              <p className="text-center text-[#492775] dark:text-[#A395DA] font-bold text-sm animate-pulse">Chargement...</p>
+            </div>
+          )}
+
+          {!loading &&
+            filteredPosts.map((post) => (
+              <PostCard
+                key={post._id}
+                id={post._id}
+                author={post.author?.username ?? "Anonyme"}
+                timeAgo={timeAgo(post.createdAt)}
+                content={post.content}
+                likes={formatCount(post.likes.length)}
+                comments={formatCount(post.comments.length)}
+                shares="0"
+                avatarUrl={post.author?.avatar}
+                imageUrl={post.image}
+                isLiked={user ? post.likes.includes(user._id) : false}
+                onLike={user ? () => handleLike(post._id) : undefined}
+                onRequireAuth={!user ? () => router.push("/login") : undefined}
+              />
+            ))}
+
+          {!loading && filteredPosts.length === 0 && (
+            <p className="text-center text-gray-400 mt-10 text-sm">
+              {activeTab === "following" ? "Abonne-toi pour voir des posts ici." : t("feed.noPosts")}
+            </p>
+          )}
+        </section>
+      </main>
+
+      <Navbar />
+
+    </div>
   );
 }

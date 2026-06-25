@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "../i18n";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/src/components/Navbar/Navbar";
 import { ThemeProvider } from "@/src/contexts/ThemeContext";
 import { AuthProvider } from "@/src/contexts/AuthContext";
 
@@ -20,14 +19,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body className={`${inter.className} bg-gray-200 dark:bg-gray-900 transition-colors duration-300`}>
+      <body className={`${inter.className} bg-gray-50 dark:bg-[#0b0b0c] transition-colors duration-300 text-gray-900 dark:text-gray-100`}>
         <ThemeProvider>
           <AuthProvider>
-            <div className="max-w-md mx-auto min-h-screen bg-white dark:bg-[#121212] shadow-2xl relative transition-colors duration-300">
-              <main className="pb-20">
-                {children}
-              </main>
-              <Navbar />
+            <div className="w-full min-h-screen transition-colors duration-300">
+              {children}
             </div>
           </AuthProvider>
         </ThemeProvider>
